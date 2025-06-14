@@ -3,13 +3,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Send, Sparkles, Settings, Menu } from 'lucide-react';
+import { Send, Sparkles, Settings, Plus } from 'lucide-react';
 import { ChatMessage } from './ChatMessage';
 import { VoiceHandler } from './VoiceHandler';
 import { ThemeToggle } from './ThemeToggle';
 import { ApiKeyDialog } from './ApiKeyDialog';
 import { AIProviderDialog } from './AIProviderDialog';
-import { ChatSidebar } from './ChatSidebar';
 import { ChatWelcome } from './ChatWelcome';
 import { toast } from '@/hooks/use-toast';
 import { aiService } from '@/services/aiService';
@@ -28,7 +27,6 @@ export const NovaChat: React.FC = () => {
   const [isListening, setIsListening] = useState(false);
   const [showApiDialog, setShowApiDialog] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -144,14 +142,6 @@ export const NovaChat: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-background">
-      {/* Sidebar */}
-      {sidebarOpen && (
-        <ChatSidebar 
-          onNewChat={handleNewChat}
-          onSettingsClick={() => setShowApiDialog(true)}
-        />
-      )}
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
@@ -159,14 +149,6 @@ export const NovaChat: React.FC = () => {
           <div className="container mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => setSidebarOpen(!sidebarOpen)}
-                  className="h-8 w-8"
-                >
-                  <Menu className="h-4 w-4" />
-                </Button>
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-6 w-6 text-primary" />
                   <h1 className="text-xl font-bold">Nova</h1>
@@ -189,6 +171,15 @@ export const NovaChat: React.FC = () => {
                 )}
               </div>
               <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleNewChat}
+                  className="h-8 gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  New Chat
+                </Button>
                 <Button
                   size="icon"
                   variant="outline"
