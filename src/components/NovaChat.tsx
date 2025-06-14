@@ -150,6 +150,7 @@ export const NovaChat: React.FC = () => {
   };
 
   const currentProvider = aiService.getProvider();
+  const currentModel = aiService.getCurrentModel();
   const hasMessages = messages.length > 0;
 
   return (
@@ -171,14 +172,19 @@ export const NovaChat: React.FC = () => {
                   </div>
                 )}
                 {hasApiKey && currentProvider && (
-                  <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
-                    <div className="w-2 h-2 bg-green-500 rounded-full" />
-                    {currentProvider.name} Connected
-                    {currentProvider.isFree && (
-                      <span className="ml-1 px-1 py-0.5 text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
-                        FREE
-                      </span>
-                    )}
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                      <div className="w-2 h-2 bg-green-500 rounded-full" />
+                      {currentProvider.name} Connected
+                      {currentProvider.isFree && (
+                        <span className="ml-1 px-1 py-0.5 text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
+                          FREE
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Model: {currentModel}
+                    </div>
                   </div>
                 )}
               </div>
