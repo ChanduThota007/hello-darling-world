@@ -1,3 +1,4 @@
+
 import { AI_PROVIDERS, AIProvider } from './aiProviders';
 
 interface Message {
@@ -84,7 +85,7 @@ export class AIService {
       return `${provider.endpoint}/${this.model}`;
     }
 
-    // OpenAI and Groq use the same endpoint format
+    // OpenAI, Groq, Together AI, and Perplexity use the same endpoint format
     return provider.endpoint;
   }
 
@@ -204,11 +205,31 @@ export class AIService {
           return await this.callHuggingFaceAPI(formattedMessages);
         case 'openai':
         case 'groq':
+        case 'together':
+        case 'perplexity':
         default:
           return await this.callOpenAICompatibleAPI(formattedMessages);
       }
     } catch (error) {
       console.error('AI Service Error:', error);
+      
+      // If current provider fails, try to fallback to another free provider
+      if (this.provider !== 'groq') {
+        console.log('Attempting fallback to Groq...');
+        const originalProvider = this.provider;
+        this.setProvider('groq');
+        
+        try {
+          const fallbackKey = this.getApiKey();
+          if (fallbackKey) {
+            return await this.callOpenAICompatibleAPI(formattedMessages);
+          }
+        } catch (fallbackError) {
+          console.error('Fallback also failed:', fallbackError);
+          this.setProvider(originalProvider); // Restore original provider
+        }
+      }
+      
       throw error;
     }
   }

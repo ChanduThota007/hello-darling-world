@@ -51,6 +51,10 @@ export const AIProviderDialog: React.FC<AIProviderDialogProps> = ({
         return 'https://console.groq.com/keys';
       case 'huggingface':
         return 'https://huggingface.co/settings/tokens';
+      case 'together':
+        return 'https://api.together.xyz/settings/api-keys';
+      case 'perplexity':
+        return 'https://www.perplexity.ai/settings/api';
       default:
         return '#';
     }
@@ -143,7 +147,9 @@ export const AIProviderDialog: React.FC<AIProviderDialogProps> = ({
                 type="password"
                 placeholder={
                   selectedProvider.id === 'google' ? 'AIza...' : 
-                  selectedProvider.id === 'huggingface' ? 'hf_...' : 
+                  selectedProvider.id === 'huggingface' ? 'hf_...' :
+                  selectedProvider.id === 'together' ? 'together_...' :
+                  selectedProvider.id === 'perplexity' ? 'pplx-...' :
                   'sk-...'
                 }
                 value={apiKey}
