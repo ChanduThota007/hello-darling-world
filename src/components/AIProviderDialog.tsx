@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Bot, ExternalLink } from 'lucide-react';
+import { Bot, ExternalLink, Crown, Zap } from 'lucide-react';
 import { AI_PROVIDERS, AIProvider } from '@/services/aiProviders';
 
 interface AIProviderDialogProps {
@@ -55,11 +55,6 @@ export const AIProviderDialog: React.FC<AIProviderDialogProps> = ({
           url: 'https://huggingface.co/settings/tokens',
           text: 'Get your free token from Hugging Face'
         };
-      case 'cohere':
-        return {
-          url: 'https://dashboard.cohere.ai/api-keys',
-          text: 'Get your API key from Cohere Dashboard'
-        };
       case 'openai':
         return {
           url: 'https://platform.openai.com/api-keys',
@@ -70,7 +65,30 @@ export const AIProviderDialog: React.FC<AIProviderDialogProps> = ({
     }
   };
 
+  const getBadgeForProvider = (provider: AIProvider) => {
+    if (provider.trialType === 'completely-free') {
+      return (
+        <Badge variant="secondary" className="text-xs bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+          <Zap className="h-3 w-3 mr-1" />
+          ALWAYS FREE
+        </Badge>
+      );
+    } else if (provider.trialType === 'free-trial') {
+      return (
+        <Badge variant="outline" className="text-xs border-orange-200 text-orange-700 dark:border-orange-800 dark:text-orange-300">
+          <Crown className="h-3 w-3 mr-1" />
+          FREE TRIAL
+        </Badge>
+      );
+    }
+    return null;
+  };
+
   const instructions = getApiKeyInstructions(selectedProvider);
+
+  // Separate providers by type
+  const freeProviders = AI_PROVIDERS.filter(p => p.trialType === 'completely-free');
+  const trialProviders = AI_PROVIDERS.filter(p => p.trialType === 'free-trial');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -81,37 +99,71 @@ export const AIProviderDialog: React.FC<AIProviderDialogProps> = ({
             Choose AI Provider
           </DialogTitle>
           <DialogDescription>
-            Select your preferred AI provider and enter your API key to enable Nova's capabilities.
+            Select your preferred AI provider. We recommend starting with completely free options.
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-2">
-            {AI_PROVIDERS.map((provider) => (
-              <div
-                key={provider.id}
-                className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                  selectedProvider.id === provider.id
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:border-primary/50'
-                }`}
-                onClick={() => setSelectedProvider(provider)}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{provider.name}</span>
-                      {provider.isFree && (
-                        <Badge variant="secondary" className="text-xs">
-                          FREE
-                        </Badge>
-                      )}
+          {/* Free Providers Section */}
+          <div>
+            <h3 className="text-sm font-medium text-green-700 dark:text-green-300 mb-2 flex items-center gap-1">
+              <Zap className="h-4 w-4" />
+              Completely Free (Recommended)
+            </h3>
+            <div className="grid grid-cols-1 gap-2">
+              {freeProviders.map((provider) => (
+                <div
+                  key={provider.id}
+                  className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                    selectedProvider.id === provider.id
+                      ? 'border-green-500 bg-green-50 dark:bg-green-950'
+                      : 'border-border hover:border-green-300'
+                  }`}
+                  onClick={() => setSelectedProvider(provider)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{provider.name}</span>
+                        {getBadgeForProvider(provider)}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{provider.description}</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">{provider.description}</p>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+
+          {/* Trial Providers Section */}
+          <div>
+            <h3 className="text-sm font-medium text-orange-700 dark:text-orange-300 mb-2 flex items-center gap-1">
+              <Crown className="h-4 w-4" />
+              Free Trial Options
+            </h3>
+            <div className="grid grid-cols-1 gap-2">
+              {trialProviders.map((provider) => (
+                <div
+                  key={provider.id}
+                  className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                    selectedProvider.id === provider.id
+                      ? 'border-orange-500 bg-orange-50 dark:bg-orange-950'
+                      : 'border-border hover:border-orange-300'
+                  }`}
+                  onClick={() => setSelectedProvider(provider)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{provider.name}</span>
+                        {getBadgeForProvider(provider)}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{provider.description}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -155,6 +207,11 @@ export const AIProviderDialog: React.FC<AIProviderDialogProps> = ({
                 onChange={(e) => setApiKey(e.target.value)}
                 className="font-mono text-sm"
               />
+              {selectedProvider.trialType === 'free-trial' && (
+                <p className="text-xs text-orange-600 dark:text-orange-400">
+                  ⚠️ This provider offers a free trial, after which you'll need to pay for usage.
+                </p>
+              )}
             </div>
 
             <div className="flex justify-end gap-2">
