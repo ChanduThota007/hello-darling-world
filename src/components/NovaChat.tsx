@@ -2,12 +2,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Send, Sparkles } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Send, Sparkles, Settings } from 'lucide-react';
 import { ChatMessage } from './ChatMessage';
 import { VoiceHandler } from './VoiceHandler';
 import { ThemeToggle } from './ThemeToggle';
+import { ApiKeyDialog } from './ApiKeyDialog';
 import { toast } from '@/hooks/use-toast';
+import { aiService } from '@/services/aiService';
 
 interface Message {
   id: string;
@@ -20,7 +22,7 @@ export const NovaChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: "Hello! I'm Nova, your personal AI assistant. How can I help you today?",
+      content: "Hello! I'm Nova, your personal AI assistant. I'm ready to help you with tasks, questions, and conversations. How can I assist you today?",
       sender: 'nova',
       timestamp: new Date()
     }
@@ -28,6 +30,8 @@ export const NovaChat: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [showApiDialog, setShowApiDialog] = useState(false);
+  const [hasApiKey, setHasApiKey] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -38,8 +42,19 @@ export const NovaChat: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    // Check if API key exists on mount
+    const existingKey = aiService.getApiKey();
+    setHasApiKey(!!existingKey);
+  }, []);
+
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
+
+    if (!hasApiKey) {
+      setShowApiDialog(true);
+      return;
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -53,27 +68,48 @@ export const NovaChat: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Simulate AI response for now
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const conversationHistory = [...messages, userMessage].slice(-10); // Keep last 10 messages for context
+      const response = await aiService.generateResponse(conversationHistory);
       
       const novaResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: `I understand you said: "${content}". This is a placeholder response while we set up the AI backend. I'm ready to help you with tasks, questions, and conversations!`,
+        content: response,
         sender: 'nova',
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, novaResponse]);
     } catch (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive"
-      });
+      console.error('Error generating AI response:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      if (errorMessage.includes('API key') || errorMessage.includes('401')) {
+        setHasApiKey(false);
+        setShowApiDialog(true);
+        toast({
+          title: "API Key Issue",
+          description: "Please check your OpenAI API key and try again.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: `Failed to get AI response: ${errorMessage}`,
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleApiKeySet = (key: string) => {
+    aiService.setApiKey(key);
+    setHasApiKey(true);
+    toast({
+      title: "Connected!",
+      description: "Nova is now powered by OpenAI.",
+    });
   };
 
   const handleVoiceResult = (transcript: string) => {
@@ -102,8 +138,24 @@ export const NovaChat: React.FC = () => {
               <div className="text-sm text-muted-foreground">
                 Your Personal AI Assistant
               </div>
+              {hasApiKey && (
+                <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                  <div className="w-2 h-2 bg-green-500 rounded-full" />
+                  AI Connected
+                </div>
+              )}
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() => setShowApiDialog(true)}
+                className="h-8 w-8"
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </div>
@@ -145,7 +197,7 @@ export const NovaChat: React.FC = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Type a message or use voice input..."
+                placeholder={hasApiKey ? "Type a message or use voice input..." : "Connect to OpenAI to start chatting..."}
                 disabled={isLoading}
                 className="flex-1"
               />
@@ -165,6 +217,12 @@ export const NovaChat: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <ApiKeyDialog
+        open={showApiDialog}
+        onOpenChange={setShowApiDialog}
+        onApiKeySet={handleApiKeySet}
+      />
     </div>
   );
 };
