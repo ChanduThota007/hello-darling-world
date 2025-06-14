@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User, Bot } from 'lucide-react';
 
 interface ChatMessageProps {
@@ -11,10 +11,14 @@ interface ChatMessageProps {
     sender: 'user' | 'nova';
     timestamp: Date;
   };
+  userAvatar?: string;
 }
 
-export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
+export const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar }) => {
   const isUser = message.sender === 'user';
+  
+  // AI avatar - using a nice placeholder image
+  const aiAvatar = "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=100&h=100&fit=crop&crop=face";
   
   return (
     <div className={cn(
@@ -22,6 +26,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       isUser ? "flex-row-reverse" : "flex-row"
     )}>
       <Avatar className="h-8 w-8 mt-1">
+        <AvatarImage 
+          src={isUser ? userAvatar : aiAvatar} 
+          alt={isUser ? "User" : "Nova AI"} 
+        />
         <AvatarFallback className={cn(
           isUser ? "bg-primary text-primary-foreground" : "bg-muted"
         )}>

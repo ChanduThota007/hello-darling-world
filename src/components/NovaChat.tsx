@@ -2,15 +2,17 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Send, Sparkles, Settings, Plus } from 'lucide-react';
+import { Send, Sparkles, Settings, Plus, User } from 'lucide-react';
 import { ChatMessage } from './ChatMessage';
 import { VoiceHandler } from './VoiceHandler';
 import { ThemeToggle } from './ThemeToggle';
 import { ApiKeyDialog } from './ApiKeyDialog';
 import { AIProviderDialog } from './AIProviderDialog';
+import { UserProfileDialog } from './UserProfileDialog';
 import { ChatWelcome } from './ChatWelcome';
 import { toast } from '@/hooks/use-toast';
 import { aiService } from '@/services/aiService';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface Message {
   id: string;
@@ -25,7 +27,9 @@ export const NovaChat: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [showApiDialog, setShowApiDialog] = useState(false);
+  const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(false);
+  const [userAvatar, setUserAvatar] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -50,6 +54,12 @@ export const NovaChat: React.FC = () => {
       });
     };
 
+    // Load user avatar from localStorage
+    const savedAvatar = localStorage.getItem('nova-user-avatar');
+    if (savedAvatar) {
+      setUserAvatar(savedAvatar);
+    }
+
     // Initial check
     checkApiKey();
     
@@ -57,6 +67,11 @@ export const NovaChat: React.FC = () => {
     const interval = setInterval(checkApiKey, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleAvatarChange = (avatarUrl: string) => {
+    setUserAvatar(avatarUrl);
+    localStorage.setItem('nova-user-avatar', avatarUrl);
+  };
 
   const handleNewChat = () => {
     setMessages([]);
@@ -190,6 +205,20 @@ export const NovaChat: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Button
+                  size="icon"
+                  variant="outline"
+                  onClick={() => setShowProfileDialog(true)}
+                  className="h-8 w-8"
+                  title="Change Profile Photo"
+                >
+                  <Avatar className="h-5 w-5">
+                    <AvatarImage src={userAvatar} alt="User avatar" />
+                    <AvatarFallback>
+                      <User className="h-3 w-3" />
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+                <Button
                   size="sm"
                   variant="outline"
                   onClick={handleNewChat}
@@ -221,7 +250,11 @@ export const NovaChat: React.FC = () => {
               <Card className="h-full flex flex-col">
                 <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
                   {messages.map((message) => (
-                    <ChatMessage key={message.id} message={message} />
+                    <ChatMessage 
+                      key={message.id} 
+                      message={message} 
+                      userAvatar={userAvatar}
+                    />
                   ))}
                   {isLoading && (
                     <div className="flex gap-3 mb-4">
@@ -281,6 +314,13 @@ export const NovaChat: React.FC = () => {
         onOpenChange={setShowApiDialog}
         onProviderSet={handleProviderSet}
         currentProvider={aiService.getProvider()?.id}
+      />
+
+      <UserProfileDialog
+        open={showProfileDialog}
+        onOpenChange={setShowProfileDialog}
+        currentAvatar={userAvatar}
+        onAvatarChange={handleAvatarChange}
       />
     </div>
   );
