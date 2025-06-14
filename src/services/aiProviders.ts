@@ -49,25 +49,5 @@ export const AI_PROVIDERS: AIProvider[] = [
     models: ['microsoft/DialoGPT-large', 'facebook/blenderbot-400M-distill', 'microsoft/DialoGPT-medium'],
     trialType: 'completely-free',
     endpoint: 'https://api-inference.huggingface.co/models'
-  },
-  {
-    id: 'together',
-    name: 'Together AI',
-    description: 'Fast inference for open-source models with free credits',
-    isFree: true,
-    requiresApiKey: true,
-    models: ['mistralai/Mixtral-8x7B-Instruct-v0.1', 'meta-llama/Llama-2-70b-chat-hf', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO'],
-    trialType: 'free-trial',
-    endpoint: 'https://api.together.xyz/v1/chat/completions'
-  },
-  {
-    id: 'perplexity',
-    name: 'Perplexity AI',
-    description: 'Research-focused AI with free tier and web search capabilities',
-    isFree: true,
-    requiresApiKey: true,
-    models: ['llama-3.1-sonar-small-128k-online', 'llama-3.1-sonar-large-128k-online', 'llama-3.1-8b-instruct'],
-    trialType: 'free-trial',
-    endpoint: 'https://api.perplexity.ai/chat/completions'
   }
 ];
