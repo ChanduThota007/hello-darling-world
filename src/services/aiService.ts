@@ -1,4 +1,3 @@
-
 import { AI_PROVIDERS, AIProvider } from './aiProviders';
 
 interface Message {
@@ -34,7 +33,43 @@ export class AIService {
   private provider: string = 'groq'; // Default to Groq (free)
   private model: string = 'llama-3.1-70b-versatile';
 
+  constructor() {
+    // Load saved settings on initialization
+    this.loadSavedSettings();
+  }
+
+  private loadSavedSettings() {
+    // Load saved provider and model
+    const savedProvider = localStorage.getItem('nova-ai-provider');
+    const savedModel = localStorage.getItem('nova-ai-model');
+    
+    if (savedProvider) {
+      this.provider = savedProvider;
+    }
+    
+    if (savedModel) {
+      this.model = savedModel;
+    } else {
+      // Set default model for current provider
+      const provider = AI_PROVIDERS.find(p => p.id === this.provider);
+      if (provider && provider.models.length > 0) {
+        this.model = provider.models[0];
+      }
+    }
+
+    // Load saved API key for current provider
+    this.apiKey = localStorage.getItem(`nova-${this.provider}-key`);
+    
+    console.log('Loaded settings:', {
+      provider: this.provider,
+      model: this.model,
+      hasApiKey: !!this.apiKey
+    });
+  }
+
   setProvider(providerId: string, model?: string) {
+    console.log('Setting provider:', providerId, 'with model:', model);
+    
     this.provider = providerId;
     if (model) {
       this.model = model;
@@ -45,18 +80,30 @@ export class AIService {
         this.model = provider.models[0];
       }
     }
+    
+    // Save provider and model settings
     localStorage.setItem('nova-ai-provider', providerId);
     localStorage.setItem('nova-ai-model', this.model);
+    
+    // Load existing API key for this provider
+    this.apiKey = localStorage.getItem(`nova-${this.provider}-key`);
+    
+    console.log('Provider set. API key available:', !!this.apiKey);
   }
 
   setApiKey(key: string) {
+    console.log('Setting API key for provider:', this.provider);
     this.apiKey = key;
+    // Store API key with provider-specific key
     localStorage.setItem(`nova-${this.provider}-key`, key);
+    console.log('API key stored for provider:', this.provider);
   }
 
   getApiKey(): string | null {
     if (!this.apiKey) {
+      // Try to load from localStorage
       this.apiKey = localStorage.getItem(`nova-${this.provider}-key`);
+      console.log('Loaded API key from storage for provider:', this.provider, 'Found:', !!this.apiKey);
     }
     return this.apiKey;
   }
@@ -85,7 +132,7 @@ export class AIService {
       return `${provider.endpoint}/${this.model}`;
     }
 
-    // OpenAI, Groq, Together AI, and Perplexity use the same endpoint format
+    // OpenAI, Groq use the same endpoint format
     return provider.endpoint;
   }
 
@@ -205,8 +252,6 @@ export class AIService {
           return await this.callHuggingFaceAPI(formattedMessages);
         case 'openai':
         case 'groq':
-        case 'together':
-        case 'perplexity':
         default:
           return await this.callOpenAICompatibleAPI(formattedMessages);
       }

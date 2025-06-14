@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,17 +37,25 @@ export const NovaChat: React.FC = () => {
   }, [messages]);
 
   useEffect(() => {
-    // Check if API key exists on mount and load saved provider
-    const savedProvider = localStorage.getItem('nova-ai-provider') || 'groq';
-    const savedModel = localStorage.getItem('nova-ai-model');
+    // Check if API key exists on mount
+    const checkApiKey = () => {
+      const existingKey = aiService.getApiKey();
+      const keyExists = !!existingKey;
+      setHasApiKey(keyExists);
+      
+      console.log('API key check:', {
+        provider: aiService.getProvider()?.name,
+        hasKey: keyExists,
+        keyLength: existingKey?.length || 0
+      });
+    };
+
+    // Initial check
+    checkApiKey();
     
-    aiService.setProvider(savedProvider, savedModel || undefined);
-    
-    const existingKey = aiService.getApiKey();
-    setHasApiKey(!!existingKey);
-    
-    console.log('Current provider:', savedProvider);
-    console.log('Has API key:', !!existingKey);
+    // Also check periodically to catch any storage changes
+    const interval = setInterval(checkApiKey, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleNewChat = () => {
@@ -61,6 +68,11 @@ export const NovaChat: React.FC = () => {
 
     if (!hasApiKey) {
       setShowApiDialog(true);
+      toast({
+        title: "API Key Required",
+        description: "Please connect to an AI provider first to start chatting.",
+        variant: "destructive"
+      });
       return;
     }
 
@@ -97,7 +109,7 @@ export const NovaChat: React.FC = () => {
         setShowApiDialog(true);
         toast({
           title: "API Key Issue",
-          description: "Please check your OpenAI API key and try again.",
+          description: "Please check your API key and try again.",
           variant: "destructive"
         });
       } else {
@@ -113,15 +125,15 @@ export const NovaChat: React.FC = () => {
   };
 
   const handleProviderSet = (providerId: string, key: string, model?: string) => {
-    console.log('Setting provider:', providerId, 'with model:', model);
+    console.log('Setting provider and API key:', providerId, 'with model:', model);
     aiService.setProvider(providerId, model);
     aiService.setApiKey(key);
     setHasApiKey(true);
     
     const provider = aiService.getProvider();
     toast({
-      title: "Connected!",
-      description: `Nova is now powered by ${provider?.name || 'AI'}.`,
+      title: "Connected Successfully!",
+      description: `Nova is now powered by ${provider?.name || 'AI'}. Your API key has been saved securely.`,
     });
   };
 
