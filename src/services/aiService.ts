@@ -16,8 +16,8 @@ interface AIResponse {
 
 export class AIService {
   private apiKey: string | null = null;
-  private provider: string = 'groq'; // Default to free Groq
-  private model: string = 'llama-3.1-8b-instant';
+  private provider: string = 'openai'; // Default to OpenAI
+  private model: string = 'gpt-3.5-turbo';
 
   setProvider(providerId: string, model?: string) {
     this.provider = providerId;
@@ -55,21 +55,10 @@ export class AIService {
   }
 
   private getApiEndpoint(): string {
-    switch (this.provider) {
-      case 'groq':
-        return 'https://api.groq.com/openai/v1/chat/completions';
-      case 'huggingface':
-        return `https://api-inference.huggingface.co/models/${this.model}`;
-      case 'cohere':
-        return 'https://api.cohere.ai/v1/chat';
-      case 'openai':
-        return 'https://api.openai.com/v1/chat/completions';
-      default:
-        throw new Error(`Unsupported provider: ${this.provider}`);
-    }
+    return 'https://api.openai.com/v1/chat/completions';
   }
 
-  private async callGroqAPI(messages: Message[]): Promise<string> {
+  private async callOpenAIAPI(messages: Message[]): Promise<string> {
     const response = await fetch(this.getApiEndpoint(), {
       method: 'POST',
       headers: {
@@ -93,62 +82,10 @@ export class AIService {
     return data.choices[0]?.message?.content || 'Sorry, I couldn\'t generate a response.';
   }
 
-  private async callHuggingFaceAPI(messages: Message[]): Promise<string> {
-    const lastMessage = messages[messages.length - 1].content;
-    
-    const response = await fetch(this.getApiEndpoint(), {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        inputs: lastMessage,
-        parameters: {
-          max_length: 1000,
-          temperature: 0.7,
-        }
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data[0]?.generated_text || 'Sorry, I couldn\'t generate a response.';
-  }
-
-  private async callCohereAPI(messages: Message[]): Promise<string> {
-    const response = await fetch(this.getApiEndpoint(), {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: this.model,
-        message: messages[messages.length - 1].content,
-        chat_history: messages.slice(0, -1).map(msg => ({
-          role: msg.role,
-          message: msg.content
-        })),
-        max_tokens: 1000,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.text || 'Sorry, I couldn\'t generate a response.';
-  }
-
   async generateResponse(messages: Array<{ content: string; sender: 'user' | 'nova' }>): Promise<string> {
     const apiKey = this.getApiKey();
     if (!apiKey) {
-      throw new Error(`${this.getProvider()?.name || 'AI'} API key not set`);
+      throw new Error('OpenAI API key not set');
     }
 
     const formattedMessages: Message[] = [
@@ -165,17 +102,7 @@ export class AIService {
     ];
 
     try {
-      switch (this.provider) {
-        case 'groq':
-        case 'openai':
-          return await this.callGroqAPI(formattedMessages);
-        case 'huggingface':
-          return await this.callHuggingFaceAPI(formattedMessages);
-        case 'cohere':
-          return await this.callCohereAPI(formattedMessages);
-        default:
-          throw new Error(`Unsupported provider: ${this.provider}`);
-      }
+      return await this.callOpenAIAPI(formattedMessages);
     } catch (error) {
       console.error('AI Service Error:', error);
       throw error;
