@@ -6,10 +6,26 @@ interface Message {
   content: string;
 }
 
-interface AIResponse {
+interface OpenAIResponse {
   choices: Array<{
     message: {
       content: string;
+    };
+  }>;
+}
+
+interface AnthropicResponse {
+  content: Array<{
+    text: string;
+  }>;
+}
+
+interface GeminiResponse {
+  candidates: Array<{
+    content: {
+      parts: Array<{
+        text: string;
+      }>;
     };
   }>;
 }
@@ -55,10 +71,20 @@ export class AIService {
   }
 
   private getApiEndpoint(): string {
-    return 'https://api.openai.com/v1/chat/completions';
+    const provider = this.getProvider();
+    if (!provider?.endpoint) {
+      return 'https://api.openai.com/v1/chat/completions';
+    }
+
+    // Special handling for Google Gemini
+    if (this.provider === 'google') {
+      return `${provider.endpoint}/${this.model}:generateContent`;
+    }
+
+    return provider.endpoint;
   }
 
-  private async callOpenAIAPI(messages: Message[]): Promise<string> {
+  private async callOpenAICompatibleAPI(messages: Message[]): Promise<string> {
     const response = await fetch(this.getApiEndpoint(), {
       method: 'POST',
       headers: {
@@ -78,14 +104,78 @@ export class AIService {
       throw new Error(errorData.error?.message || `HTTP ${response.status}`);
     }
 
-    const data: AIResponse = await response.json();
+    const data: OpenAIResponse = await response.json();
     return data.choices[0]?.message?.content || 'Sorry, I couldn\'t generate a response.';
+  }
+
+  private async callAnthropicAPI(messages: Message[]): Promise<string> {
+    const systemMessage = messages.find(m => m.role === 'system');
+    const conversationMessages = messages.filter(m => m.role !== 'system');
+
+    const response = await fetch(this.getApiEndpoint(), {
+      method: 'POST',
+      headers: {
+        'x-api-key': this.apiKey!,
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: this.model,
+        max_tokens: 1000,
+        system: systemMessage?.content,
+        messages: conversationMessages,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `HTTP ${response.status}`);
+    }
+
+    const data: AnthropicResponse = await response.json();
+    return data.content[0]?.text || 'Sorry, I couldn\'t generate a response.';
+  }
+
+  private async callGoogleAPI(messages: Message[]): Promise<string> {
+    const contents = messages
+      .filter(m => m.role !== 'system')
+      .map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+      }));
+
+    const systemInstruction = messages.find(m => m.role === 'system');
+
+    const response = await fetch(`${this.getApiEndpoint()}?key=${this.apiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents,
+        systemInstruction: systemInstruction ? {
+          parts: [{ text: systemInstruction.content }]
+        } : undefined,
+        generationConfig: {
+          maxOutputTokens: 1000,
+          temperature: 0.7,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `HTTP ${response.status}`);
+    }
+
+    const data: GeminiResponse = await response.json();
+    return data.candidates[0]?.content?.parts[0]?.text || 'Sorry, I couldn\'t generate a response.';
   }
 
   async generateResponse(messages: Array<{ content: string; sender: 'user' | 'nova' }>): Promise<string> {
     const apiKey = this.getApiKey();
     if (!apiKey) {
-      throw new Error('OpenAI API key not set');
+      throw new Error(`${this.getProvider()?.name || 'AI'} API key not set`);
     }
 
     const formattedMessages: Message[] = [
@@ -102,7 +192,17 @@ export class AIService {
     ];
 
     try {
-      return await this.callOpenAIAPI(formattedMessages);
+      switch (this.provider) {
+        case 'anthropic':
+          return await this.callAnthropicAPI(formattedMessages);
+        case 'google':
+          return await this.callGoogleAPI(formattedMessages);
+        case 'openai':
+        case 'groq':
+        case 'mistral':
+        default:
+          return await this.callOpenAICompatibleAPI(formattedMessages);
+      }
     } catch (error) {
       console.error('AI Service Error:', error);
       throw error;

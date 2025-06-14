@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Bot, ExternalLink } from 'lucide-react';
+import { Bot, ExternalLink, Sparkles } from 'lucide-react';
 import { AI_PROVIDERS, AIProvider } from '@/services/aiProviders';
 
 interface AIProviderDialogProps {
@@ -42,29 +42,67 @@ export const AIProviderDialog: React.FC<AIProviderDialogProps> = ({
     }
   };
 
+  const getApiKeyUrl = (providerId: string) => {
+    switch (providerId) {
+      case 'openai':
+        return 'https://platform.openai.com/api-keys';
+      case 'anthropic':
+        return 'https://console.anthropic.com/account/keys';
+      case 'google':
+        return 'https://makersuite.google.com/app/apikey';
+      case 'groq':
+        return 'https://console.groq.com/keys';
+      case 'mistral':
+        return 'https://console.mistral.ai/api-keys/';
+      default:
+        return '#';
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Bot className="h-5 w-5" />
-            Connect to OpenAI
+            Connect AI Provider
           </DialogTitle>
           <DialogDescription>
-            Enter your OpenAI API key to enable Nova's AI capabilities.
+            Choose an AI provider and enter your API key to enable Nova's capabilities.
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">
-          <div className="p-3 rounded-lg border bg-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">OpenAI</span>
+          <div className="space-y-3">
+            <Label>AI Provider</Label>
+            {AI_PROVIDERS.map((provider) => (
+              <div
+                key={provider.id}
+                className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                  selectedProvider.id === provider.id
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/50'
+                }`}
+                onClick={() => setSelectedProvider(provider)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{provider.name}</span>
+                      {provider.isFree && (
+                        <span className="px-2 py-0.5 text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
+                          {provider.trialType === 'completely-free' ? 'FREE' : 'FREE TRIAL'}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">{provider.description}</p>
+                  </div>
+                  {selectedProvider.id === provider.id && (
+                    <Sparkles className="h-4 w-4 text-primary" />
+                  )}
                 </div>
-                <p className="text-sm text-muted-foreground">Industry leading AI models including GPT-4</p>
               </div>
-            </div>
+            ))}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -91,17 +129,17 @@ export const AIProviderDialog: React.FC<AIProviderDialogProps> = ({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => window.open('https://platform.openai.com/api-keys', '_blank')}
+                  onClick={() => window.open(getApiKeyUrl(selectedProvider.id), '_blank')}
                   className="h-auto p-0 text-xs text-primary hover:underline"
                 >
-                  Get your API key from OpenAI Platform
+                  Get API key for {selectedProvider.name}
                   <ExternalLink className="h-3 w-3 ml-1" />
                 </Button>
               </div>
               <Input
                 id="apikey"
                 type="password"
-                placeholder="sk-..."
+                placeholder={selectedProvider.id === 'google' ? 'AIza...' : selectedProvider.id === 'anthropic' ? 'sk-ant-...' : 'sk-...'}
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 className="font-mono text-sm"
