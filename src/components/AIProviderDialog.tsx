@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -19,7 +18,7 @@ export const AIProviderDialog: React.FC<AIProviderDialogProps> = ({
   open, 
   onOpenChange, 
   onProviderSet,
-  currentProvider = 'openai'
+  currentProvider = 'groq'
 }) => {
   const [selectedProvider, setSelectedProvider] = useState<AIProvider>(
     AI_PROVIDERS.find(p => p.id === currentProvider) || AI_PROVIDERS[0]
@@ -44,16 +43,12 @@ export const AIProviderDialog: React.FC<AIProviderDialogProps> = ({
 
   const getApiKeyUrl = (providerId: string) => {
     switch (providerId) {
-      case 'openai':
-        return 'https://platform.openai.com/api-keys';
-      case 'anthropic':
-        return 'https://console.anthropic.com/account/keys';
       case 'google':
         return 'https://makersuite.google.com/app/apikey';
       case 'groq':
         return 'https://console.groq.com/keys';
-      case 'mistral':
-        return 'https://console.mistral.ai/api-keys/';
+      case 'huggingface':
+        return 'https://huggingface.co/settings/tokens';
       default:
         return '#';
     }

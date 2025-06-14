@@ -1,4 +1,3 @@
-
 import { AI_PROVIDERS, AIProvider } from './aiProviders';
 
 interface Message {
@@ -14,12 +13,6 @@ interface OpenAIResponse {
   }>;
 }
 
-interface AnthropicResponse {
-  content: Array<{
-    text: string;
-  }>;
-}
-
 interface GeminiResponse {
   candidates: Array<{
     content: {
@@ -30,10 +23,15 @@ interface GeminiResponse {
   }>;
 }
 
+interface HuggingFaceResponse {
+  generated_text?: string;
+  error?: string;
+}
+
 export class AIService {
   private apiKey: string | null = null;
-  private provider: string = 'openai'; // Default to OpenAI
-  private model: string = 'gpt-3.5-turbo';
+  private provider: string = 'groq'; // Default to Groq (free)
+  private model: string = 'llama-3.1-70b-versatile';
 
   setProvider(providerId: string, model?: string) {
     this.provider = providerId;
@@ -73,12 +71,17 @@ export class AIService {
   private getApiEndpoint(): string {
     const provider = this.getProvider();
     if (!provider?.endpoint) {
-      return 'https://api.openai.com/v1/chat/completions';
+      return 'https://api.groq.com/openai/v1/chat/completions';
     }
 
     // Special handling for Google Gemini
     if (this.provider === 'google') {
       return `${provider.endpoint}/${this.model}:generateContent`;
+    }
+
+    // Special handling for Hugging Face
+    if (this.provider === 'huggingface') {
+      return `${provider.endpoint}/${this.model}`;
     }
 
     return provider.endpoint;
@@ -106,34 +109,6 @@ export class AIService {
 
     const data: OpenAIResponse = await response.json();
     return data.choices[0]?.message?.content || 'Sorry, I couldn\'t generate a response.';
-  }
-
-  private async callAnthropicAPI(messages: Message[]): Promise<string> {
-    const systemMessage = messages.find(m => m.role === 'system');
-    const conversationMessages = messages.filter(m => m.role !== 'system');
-
-    const response = await fetch(this.getApiEndpoint(), {
-      method: 'POST',
-      headers: {
-        'x-api-key': this.apiKey!,
-        'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: this.model,
-        max_tokens: 1000,
-        system: systemMessage?.content,
-        messages: conversationMessages,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error?.message || `HTTP ${response.status}`);
-    }
-
-    const data: AnthropicResponse = await response.json();
-    return data.content[0]?.text || 'Sorry, I couldn\'t generate a response.';
   }
 
   private async callGoogleAPI(messages: Message[]): Promise<string> {
@@ -172,6 +147,35 @@ export class AIService {
     return data.candidates[0]?.content?.parts[0]?.text || 'Sorry, I couldn\'t generate a response.';
   }
 
+  private async callHuggingFaceAPI(messages: Message[]): Promise<string> {
+    const lastMessage = messages[messages.length - 1];
+    const prompt = messages.map(m => `${m.role}: ${m.content}`).join('\n') + '\nassistant:';
+
+    const response = await fetch(this.getApiEndpoint(), {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        inputs: prompt,
+        parameters: {
+          max_new_tokens: 500,
+          temperature: 0.7,
+          return_full_text: false
+        }
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP ${response.status}`);
+    }
+
+    const data: HuggingFaceResponse[] = await response.json();
+    return data[0]?.generated_text?.trim() || 'Sorry, I couldn\'t generate a response.';
+  }
+
   async generateResponse(messages: Array<{ content: string; sender: 'user' | 'nova' }>): Promise<string> {
     const apiKey = this.getApiKey();
     if (!apiKey) {
@@ -193,13 +197,11 @@ export class AIService {
 
     try {
       switch (this.provider) {
-        case 'anthropic':
-          return await this.callAnthropicAPI(formattedMessages);
         case 'google':
           return await this.callGoogleAPI(formattedMessages);
-        case 'openai':
+        case 'huggingface':
+          return await this.callHuggingFaceAPI(formattedMessages);
         case 'groq':
-        case 'mistral':
         default:
           return await this.callOpenAICompatibleAPI(formattedMessages);
       }
