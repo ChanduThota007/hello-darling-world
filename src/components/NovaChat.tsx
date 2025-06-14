@@ -30,6 +30,7 @@ export const NovaChat: React.FC = () => {
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(false);
   const [userAvatar, setUserAvatar] = useState<string>('');
+  const [aiAvatar, setAiAvatar] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -54,10 +55,16 @@ export const NovaChat: React.FC = () => {
       });
     };
 
-    // Load user avatar from localStorage
-    const savedAvatar = localStorage.getItem('nova-user-avatar');
-    if (savedAvatar) {
-      setUserAvatar(savedAvatar);
+    // Load user and AI avatars from localStorage
+    const savedUserAvatar = localStorage.getItem('nova-user-avatar');
+    const savedAiAvatar = localStorage.getItem('nova-ai-avatar');
+    
+    if (savedUserAvatar) {
+      setUserAvatar(savedUserAvatar);
+    }
+    
+    if (savedAiAvatar) {
+      setAiAvatar(savedAiAvatar);
     }
 
     // Initial check
@@ -68,9 +75,14 @@ export const NovaChat: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleAvatarChange = (avatarUrl: string) => {
+  const handleUserAvatarChange = (avatarUrl: string) => {
     setUserAvatar(avatarUrl);
     localStorage.setItem('nova-user-avatar', avatarUrl);
+  };
+
+  const handleAiAvatarChange = (avatarUrl: string) => {
+    setAiAvatar(avatarUrl);
+    localStorage.setItem('nova-ai-avatar', avatarUrl);
   };
 
   const handleNewChat = () => {
@@ -209,7 +221,7 @@ export const NovaChat: React.FC = () => {
                   variant="outline"
                   onClick={() => setShowProfileDialog(true)}
                   className="h-8 w-8"
-                  title="Change Profile Photo"
+                  title="Change Profile Photos"
                 >
                   <Avatar className="h-5 w-5">
                     <AvatarImage src={userAvatar} alt="User avatar" />
@@ -254,6 +266,7 @@ export const NovaChat: React.FC = () => {
                       key={message.id} 
                       message={message} 
                       userAvatar={userAvatar}
+                      aiAvatar={aiAvatar}
                     />
                   ))}
                   {isLoading && (
@@ -319,8 +332,10 @@ export const NovaChat: React.FC = () => {
       <UserProfileDialog
         open={showProfileDialog}
         onOpenChange={setShowProfileDialog}
-        currentAvatar={userAvatar}
-        onAvatarChange={handleAvatarChange}
+        currentUserAvatar={userAvatar}
+        currentAiAvatar={aiAvatar}
+        onUserAvatarChange={handleUserAvatarChange}
+        onAiAvatarChange={handleAiAvatarChange}
       />
     </div>
   );

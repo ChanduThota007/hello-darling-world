@@ -12,13 +12,14 @@ interface ChatMessageProps {
     timestamp: Date;
   };
   userAvatar?: string;
+  aiAvatar?: string;
 }
 
-export const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar }) => {
+export const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar, aiAvatar }) => {
   const isUser = message.sender === 'user';
   
-  // AI avatar - using a nice placeholder image
-  const aiAvatar = "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=100&h=100&fit=crop&crop=face";
+  // Default AI avatar if none provided
+  const defaultAiAvatar = "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=100&h=100&fit=crop&crop=face";
   
   return (
     <div className={cn(
@@ -27,7 +28,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar })
     )}>
       <Avatar className="h-8 w-8 mt-1">
         <AvatarImage 
-          src={isUser ? userAvatar : aiAvatar} 
+          src={isUser ? userAvatar : (aiAvatar || defaultAiAvatar)} 
           alt={isUser ? "User" : "Nova AI"} 
         />
         <AvatarFallback className={cn(
