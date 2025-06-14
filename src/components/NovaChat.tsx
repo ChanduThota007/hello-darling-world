@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,13 +45,16 @@ export const NovaChat: React.FC = () => {
 
   useEffect(() => {
     // Check if API key exists on mount and load saved provider
-    const savedProvider = localStorage.getItem('nova-ai-provider') || 'groq';
+    const savedProvider = localStorage.getItem('nova-ai-provider') || 'openai';
     const savedModel = localStorage.getItem('nova-ai-model');
     
     aiService.setProvider(savedProvider, savedModel || undefined);
     
     const existingKey = aiService.getApiKey();
     setHasApiKey(!!existingKey);
+    
+    console.log('Current provider:', savedProvider);
+    console.log('Has API key:', !!existingKey);
   }, []);
 
   const handleSendMessage = async (content: string) => {
@@ -74,6 +78,7 @@ export const NovaChat: React.FC = () => {
 
     try {
       const conversationHistory = [...messages, userMessage].slice(-10); // Keep last 10 messages for context
+      console.log('Sending to AI service:', conversationHistory);
       const response = await aiService.generateResponse(conversationHistory);
       
       const novaResponse: Message = {
@@ -109,6 +114,7 @@ export const NovaChat: React.FC = () => {
   };
 
   const handleProviderSet = (providerId: string, key: string, model?: string) => {
+    console.log('Setting provider:', providerId, 'with model:', model);
     aiService.setProvider(providerId, model);
     aiService.setApiKey(key);
     setHasApiKey(true);
@@ -212,7 +218,7 @@ export const NovaChat: React.FC = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder={hasApiKey ? "Type a message or use voice input..." : "Connect to an AI provider to start chatting..."}
+                placeholder={hasApiKey ? "Type a message or use voice input..." : "Connect to OpenAI to start chatting..."}
                 disabled={isLoading}
                 className="flex-1"
               />
