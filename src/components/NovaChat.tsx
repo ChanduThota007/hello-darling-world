@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,7 @@ import { ChatMessage } from './ChatMessage';
 import { VoiceHandler } from './VoiceHandler';
 import { ThemeToggle } from './ThemeToggle';
 import { ApiKeyDialog } from './ApiKeyDialog';
+import { AIProviderDialog } from './AIProviderDialog';
 import { toast } from '@/hooks/use-toast';
 import { aiService } from '@/services/aiService';
 
@@ -43,7 +43,12 @@ export const NovaChat: React.FC = () => {
   }, [messages]);
 
   useEffect(() => {
-    // Check if API key exists on mount
+    // Check if API key exists on mount and load saved provider
+    const savedProvider = localStorage.getItem('nova-ai-provider') || 'groq';
+    const savedModel = localStorage.getItem('nova-ai-model');
+    
+    aiService.setProvider(savedProvider, savedModel || undefined);
+    
     const existingKey = aiService.getApiKey();
     setHasApiKey(!!existingKey);
   }, []);
@@ -103,12 +108,15 @@ export const NovaChat: React.FC = () => {
     }
   };
 
-  const handleApiKeySet = (key: string) => {
+  const handleProviderSet = (providerId: string, key: string, model?: string) => {
+    aiService.setProvider(providerId, model);
     aiService.setApiKey(key);
     setHasApiKey(true);
+    
+    const provider = aiService.getProvider();
     toast({
       title: "Connected!",
-      description: "Nova is now powered by OpenAI.",
+      description: `Nova is now powered by ${provider?.name || 'AI'}.`,
     });
   };
 
@@ -124,6 +132,8 @@ export const NovaChat: React.FC = () => {
     }
   };
 
+  const currentProvider = aiService.getProvider();
+
   return (
     <div className="flex flex-col h-screen bg-background">
       {/* Header */}
@@ -138,10 +148,15 @@ export const NovaChat: React.FC = () => {
               <div className="text-sm text-muted-foreground">
                 Your Personal AI Assistant
               </div>
-              {hasApiKey && (
+              {hasApiKey && currentProvider && (
                 <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
                   <div className="w-2 h-2 bg-green-500 rounded-full" />
-                  AI Connected
+                  {currentProvider.name} Connected
+                  {currentProvider.isFree && (
+                    <span className="ml-1 px-1 py-0.5 text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
+                      FREE
+                    </span>
+                  )}
                 </div>
               )}
             </div>
@@ -197,7 +212,7 @@ export const NovaChat: React.FC = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder={hasApiKey ? "Type a message or use voice input..." : "Connect to OpenAI to start chatting..."}
+                placeholder={hasApiKey ? "Type a message or use voice input..." : "Connect to an AI provider to start chatting..."}
                 disabled={isLoading}
                 className="flex-1"
               />
@@ -218,10 +233,11 @@ export const NovaChat: React.FC = () => {
         </div>
       </div>
 
-      <ApiKeyDialog
+      <AIProviderDialog
         open={showApiDialog}
         onOpenChange={setShowApiDialog}
-        onApiKeySet={handleApiKeySet}
+        onProviderSet={handleProviderSet}
+        currentProvider={aiService.getProvider()?.id}
       />
     </div>
   );
