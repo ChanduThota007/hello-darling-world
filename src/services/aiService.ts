@@ -84,6 +84,7 @@ export class AIService {
       return `${provider.endpoint}/${this.model}`;
     }
 
+    // OpenAI and Groq use the same endpoint format
     return provider.endpoint;
   }
 
@@ -201,6 +202,7 @@ export class AIService {
           return await this.callGoogleAPI(formattedMessages);
         case 'huggingface':
           return await this.callHuggingFaceAPI(formattedMessages);
+        case 'openai':
         case 'groq':
         default:
           return await this.callOpenAICompatibleAPI(formattedMessages);

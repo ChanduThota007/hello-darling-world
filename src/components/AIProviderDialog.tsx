@@ -43,6 +43,8 @@ export const AIProviderDialog: React.FC<AIProviderDialogProps> = ({
 
   const getApiKeyUrl = (providerId: string) => {
     switch (providerId) {
+      case 'openai':
+        return 'https://platform.openai.com/api-keys';
       case 'google':
         return 'https://makersuite.google.com/app/apikey';
       case 'groq':
@@ -87,6 +89,11 @@ export const AIProviderDialog: React.FC<AIProviderDialogProps> = ({
                       {provider.isFree && (
                         <span className="px-2 py-0.5 text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
                           {provider.trialType === 'completely-free' ? 'FREE' : 'FREE TRIAL'}
+                        </span>
+                      )}
+                      {!provider.isFree && (
+                        <span className="px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
+                          PAID
                         </span>
                       )}
                     </div>
@@ -134,7 +141,11 @@ export const AIProviderDialog: React.FC<AIProviderDialogProps> = ({
               <Input
                 id="apikey"
                 type="password"
-                placeholder={selectedProvider.id === 'google' ? 'AIza...' : selectedProvider.id === 'anthropic' ? 'sk-ant-...' : 'sk-...'}
+                placeholder={
+                  selectedProvider.id === 'google' ? 'AIza...' : 
+                  selectedProvider.id === 'huggingface' ? 'hf_...' : 
+                  'sk-...'
+                }
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 className="font-mono text-sm"

@@ -22,6 +22,15 @@ export const AI_PROVIDERS: AIProvider[] = [
     endpoint: 'https://api.groq.com/openai/v1/chat/completions'
   },
   {
+    id: 'openai',
+    name: 'OpenAI',
+    description: 'Industry-leading ChatGPT models with excellent performance',
+    isFree: false,
+    requiresApiKey: true,
+    models: ['gpt-4o', 'gpt-4o-mini', 'gpt-3.5-turbo'],
+    endpoint: 'https://api.openai.com/v1/chat/completions'
+  },
+  {
     id: 'google',
     name: 'Google Gemini',
     description: 'Google\'s advanced AI models with generous free tier',
