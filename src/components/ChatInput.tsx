@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -97,28 +96,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         </div>
       )}
       
-      <div className="bg-background border-2 border-border rounded-3xl shadow-lg p-3">
-        {/* Header with "Ask anything" moved to left */}
-        <div className="flex justify-start mb-1">
-          <span className="text-sm text-muted-foreground">Ask anything</span>
-        </div>
-        
-        {/* Input area */}
-        <div className="mb-2">
-          <Input
-            ref={inputRef}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder={hasApiKey ? (selectedTool ? `Using ${selectedTool} - describe what you want...` : "") : "Connect to an AI provider to start chatting..."}
-            disabled={isLoading}
-            className="h-12 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-2 placeholder:text-muted-foreground/60"
-          />
-        </div>
-        
-        {/* Controls row */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+      <div className="bg-background border border-border rounded-3xl shadow-sm p-4">
+        <div className="flex items-center gap-3">
+          {/* Left side - Ask anything text and controls */}
+          <div className="flex items-center gap-3 flex-1">
+            <span className="text-sm text-muted-foreground whitespace-nowrap">Ask anything</span>
+            
             <FileUpload
               onFileSelect={handleFileSelect}
               disabled={isLoading}
@@ -129,28 +112,43 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               onShowToolsDialog={onShowToolsDialog}
               disabled={isLoading}
             />
-            
+          </div>
+          
+          {/* Center - Input field */}
+          <div className="flex-1 max-w-md">
+            <Input
+              ref={inputRef}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder={hasApiKey ? (selectedTool ? `Using ${selectedTool} - describe what you want...` : "") : "Connect to an AI provider to start chatting..."}
+              disabled={isLoading}
+              className="h-10 text-sm border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 placeholder:text-muted-foreground/60"
+            />
+          </div>
+          
+          {/* Right side - Voice and Send */}
+          <div className="flex items-center gap-2">
             <VoiceHandler
               onSpeechResult={onVoiceResult}
               isListening={isListening}
               setIsListening={setIsListening}
             />
+            
+            <TooltipProvider>
+              <Button
+                onClick={handleSend}
+                disabled={isLoading || (!inputValue.trim() && !selectedFile)}
+                size="icon"
+                className="h-8 w-8 rounded-full"
+                title="Send Message"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </TooltipProvider>
           </div>
-          
-          <TooltipProvider>
-            <Button
-              onClick={handleSend}
-              disabled={isLoading || (!inputValue.trim() && !selectedFile)}
-              size="icon"
-              className="h-10 w-10 rounded-full"
-              title="Send Message"
-            >
-              <Send className="h-5 w-5" />
-            </Button>
-          </TooltipProvider>
         </div>
       </div>
     </div>
   );
 };
-
