@@ -48,7 +48,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, disabled }
         <TooltipTrigger asChild>
           <Button
             size="icon"
-            variant="outline"
+            variant="ghost"
             onClick={() => document.getElementById('file-upload')?.click()}
             disabled={disabled}
             className="h-12 w-12"

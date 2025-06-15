@@ -55,7 +55,7 @@ export const ToolsSelector: React.FC<ToolsSelectorProps> = ({
             <DropdownMenuTrigger asChild>
               <Button
                 size="icon"
-                variant="outline"
+                variant="ghost"
                 disabled={disabled}
                 className="h-12 w-12"
               >
