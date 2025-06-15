@@ -1,18 +1,13 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { Send, Sparkles, Settings, Plus, User } from 'lucide-react';
-import { ChatMessage } from './ChatMessage';
-import { VoiceHandler } from './VoiceHandler';
-import { ThemeToggle } from './ThemeToggle';
-import { ApiKeyDialog } from './ApiKeyDialog';
+import { ChatHeader } from './ChatHeader';
+import { ChatInput } from './ChatInput';
+import { ChatContainer } from './ChatContainer';
 import { AIProviderDialog } from './AIProviderDialog';
 import { UserProfileDialog } from './UserProfileDialog';
 import { ChatWelcome } from './ChatWelcome';
 import { toast } from '@/hooks/use-toast';
 import { aiService } from '@/services/aiService';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface Message {
   id: string;
@@ -169,13 +164,6 @@ export const NovaChat: React.FC = () => {
     handleSendMessage(transcript);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage(inputValue);
-    }
-  };
-
   const currentProvider = aiService.getProvider();
   const currentModel = aiService.getCurrentModel();
   const hasMessages = messages.length > 0;
@@ -185,141 +173,43 @@ export const NovaChat: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="border-b bg-card">
-          <div className="container mx-auto px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-6 w-6 text-primary" />
-                  <h1 className="text-xl font-bold">Nova</h1>
-                </div>
-                {hasMessages && (
-                  <div className="text-sm text-muted-foreground">
-                    Your Personal AI Assistant
-                  </div>
-                )}
-                {hasApiKey && currentProvider && (
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
-                      <div className="w-2 h-2 bg-green-500 rounded-full" />
-                      {currentProvider.name} Connected
-                      {currentProvider.isFree && (
-                        <span className="ml-1 px-1 py-0.5 text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
-                          FREE
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Model: {currentModel}
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={() => setShowProfileDialog(true)}
-                  className="h-8 w-8"
-                  title="Change Profile Photos"
-                >
-                  <Avatar className="h-5 w-5">
-                    <AvatarImage src={userAvatar} alt="User avatar" />
-                    <AvatarFallback>
-                      <User className="h-3 w-3" />
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleNewChat}
-                  className="h-8 gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  New Chat
-                </Button>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={() => setShowApiDialog(true)}
-                  className="h-8 w-8"
-                >
-                  <Settings className="h-4 w-4" />
-                </Button>
-                <ThemeToggle />
-              </div>
-            </div>
-          </div>
-        </div>
+        <ChatHeader
+          hasMessages={hasMessages}
+          hasApiKey={hasApiKey}
+          currentProvider={currentProvider}
+          currentModel={currentModel}
+          userAvatar={userAvatar}
+          onNewChat={handleNewChat}
+          onShowApiDialog={() => setShowApiDialog(true)}
+          onShowProfileDialog={() => setShowProfileDialog(true)}
+        />
 
         {/* Chat Area */}
         <div className="flex-1 overflow-hidden">
           {!hasMessages ? (
             <ChatWelcome />
           ) : (
-            <div className="container mx-auto px-4 py-4 h-full">
-              <Card className="h-full flex flex-col">
-                <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {messages.map((message) => (
-                    <ChatMessage 
-                      key={message.id} 
-                      message={message} 
-                      userAvatar={userAvatar}
-                      aiAvatar={aiAvatar}
-                    />
-                  ))}
-                  {isLoading && (
-                    <div className="flex gap-3 mb-4">
-                      <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                        <Sparkles className="h-4 w-4 animate-pulse" />
-                      </div>
-                      <div className="bg-muted rounded-lg px-4 py-2 text-sm">
-                        <div className="flex gap-1">
-                          <div className="w-2 h-2 bg-current rounded-full animate-pulse" />
-                          <div className="w-2 h-2 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
-                          <div className="w-2 h-2 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </CardContent>
-              </Card>
-            </div>
+            <ChatContainer
+              messages={messages}
+              isLoading={isLoading}
+              userAvatar={userAvatar}
+              aiAvatar={aiAvatar}
+              messagesEndRef={messagesEndRef}
+            />
           )}
         </div>
 
         {/* Input Area */}
-        <div className="border-t bg-card">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center gap-2 max-w-3xl mx-auto">
-              <div className="flex-1 flex items-center gap-2">
-                <Input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder={hasApiKey ? "Ask anything..." : "Connect to an AI provider to start chatting..."}
-                  disabled={isLoading}
-                  className="flex-1 h-12 text-base"
-                />
-                <Button
-                  onClick={() => handleSendMessage(inputValue)}
-                  disabled={isLoading || !inputValue.trim()}
-                  size="icon"
-                  className="h-12 w-12"
-                >
-                  <Send className="h-5 w-5" />
-                </Button>
-              </div>
-              <VoiceHandler
-                onSpeechResult={handleVoiceResult}
-                isListening={isListening}
-                setIsListening={setIsListening}
-              />
-            </div>
-          </div>
-        </div>
+        <ChatInput
+          inputValue={inputValue}
+          setInputValue={setInputValue}
+          isLoading={isLoading}
+          hasApiKey={hasApiKey}
+          isListening={isListening}
+          setIsListening={setIsListening}
+          onSendMessage={handleSendMessage}
+          onVoiceResult={handleVoiceResult}
+        />
       </div>
 
       <AIProviderDialog
