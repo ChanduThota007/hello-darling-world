@@ -364,20 +364,22 @@ export const NovaChat: React.FC = () => {
             </div>
           )}
           
-          {/* Always show input area at bottom */}
-          <div className="flex-shrink-0 border-t bg-background p-4">
-            <ChatInput
-              inputValue={inputValue}
-              setInputValue={setInputValue}
-              isLoading={isLoading}
-              hasApiKey={hasApiKey}
-              isListening={isListening}
-              setIsListening={setIsListening}
-              onSendMessage={handleSendMessage}
-              onVoiceResult={handleVoiceResult}
-              onShowToolsDialog={() => setShowToolsDialog(true)}
-              inputRef={inputRef}
-            />
+          {/* Always show input area at bottom with reduced width and no border */}
+          <div className="flex-shrink-0 bg-background px-4 py-4 flex justify-center">
+            <div className="w-full max-w-3xl">
+              <ChatInput
+                inputValue={inputValue}
+                setInputValue={setInputValue}
+                isLoading={isLoading}
+                hasApiKey={hasApiKey}
+                isListening={isListening}
+                setIsListening={setIsListening}
+                onSendMessage={handleSendMessage}
+                onVoiceResult={handleVoiceResult}
+                onShowToolsDialog={() => setShowToolsDialog(true)}
+                inputRef={inputRef}
+              />
+            </div>
           </div>
         </div>
       </div>
