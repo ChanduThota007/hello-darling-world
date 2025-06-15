@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, X } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { VoiceHandler } from './VoiceHandler';
 import { FileUpload } from './FileUpload';
 import { ToolsSelector } from './ToolsSelector';
@@ -104,14 +105,17 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               disabled={isLoading}
               className="flex-1 h-12 text-base"
             />
-            <Button
-              onClick={handleSend}
-              disabled={isLoading || (!inputValue.trim() && !selectedFile)}
-              size="icon"
-              className="h-12 w-12"
-            >
-              <Send className="h-5 w-5" />
-            </Button>
+            <TooltipProvider>
+              <Button
+                onClick={handleSend}
+                disabled={isLoading || (!inputValue.trim() && !selectedFile)}
+                size="icon"
+                className="h-12 w-12"
+                title="Send Message"
+              >
+                <Send className="h-5 w-5" />
+              </Button>
+            </TooltipProvider>
           </div>
           <FileUpload
             onFileSelect={handleFileSelect}
