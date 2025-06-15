@@ -76,7 +76,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                     <Avatar className="h-5 w-5">
                       <AvatarImage src={userAvatar} alt="User avatar" />
                       <AvatarFallback>
-                        <User className="h-3 w-3" />
+                        <User className="h-4 w-4" />
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -94,7 +94,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                     onClick={onShowSearch}
                     className="h-8 w-8"
                   >
-                    <Search className="h-4 w-4" />
+                    <Search className="h-5 w-5" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -111,7 +111,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                       onClick={onShowExport}
                       className="h-8 w-8"
                     >
-                      <Download className="h-4 w-4" />
+                      <Download className="h-5 w-5" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -128,7 +128,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                     onClick={onNewChat}
                     className="h-8 gap-2"
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus className="h-5 w-5" />
                     New Chat
                   </Button>
                 </TooltipTrigger>
@@ -145,7 +145,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                     onClick={onShowApiDialog}
                     className="h-8 w-8"
                   >
-                    <Settings className="h-4 w-4" />
+                    <Settings className="h-5 w-5" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
