@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useCallback } from 'react';
 import { Mic, MicOff, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -92,7 +93,7 @@ export const VoiceHandler: React.FC<VoiceHandlerProps> = ({
           <TooltipTrigger asChild>
             <Button
               size="icon"
-              variant={isListening ? "destructive" : "outline"}
+              variant={isListening ? "destructive" : "ghost"}
               onClick={isListening ? stopListening : startListening}
               disabled={!isSupported}
               className="h-10 w-10"
@@ -109,7 +110,7 @@ export const VoiceHandler: React.FC<VoiceHandlerProps> = ({
           <TooltipTrigger asChild>
             <Button
               size="icon"
-              variant="outline"
+              variant="ghost"
               onClick={() => speak("Hello, I'm Nova, your AI assistant.")}
               className="h-10 w-10"
             >
