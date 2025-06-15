@@ -97,46 +97,19 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       )}
       
       <div className="bg-background border border-border rounded-3xl shadow-sm p-4">
-        <div className="flex items-center gap-6">
-          {/* Left side - Ask anything text with icons row below */}
-          <div className="flex flex-col gap-6 px-2">
-            <span className="text-sm text-muted-foreground whitespace-nowrap">Ask anything</span>
-            <div className="flex items-center justify-between w-full gap-4">
-              {/* Left side icons */}
-              <div className="flex items-center gap-4">
-                <FileUpload
-                  onFileSelect={handleFileSelect}
-                  disabled={isLoading}
-                />
-                
-                <ToolsSelector
-                  onToolSelect={handleToolSelect}
-                  onShowToolsDialog={onShowToolsDialog}
-                  disabled={isLoading}
-                />
-              </div>
-
-              {/* Right side icons */}
-              <div className="flex items-center gap-4">
-                <VoiceHandler
-                  onSpeechResult={onVoiceResult}
-                  isListening={isListening}
-                  setIsListening={setIsListening}
-                />
-                
-                <TooltipProvider>
-                  <Button
-                    onClick={handleSend}
-                    disabled={isLoading || (!inputValue.trim() && !selectedFile)}
-                    size="icon"
-                    className="h-8 w-8 rounded-full"
-                    title="Send Message"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </TooltipProvider>
-              </div>
-            </div>
+        <div className="flex items-center justify-between gap-4">
+          {/* Left side icons */}
+          <div className="flex items-center gap-4">
+            <FileUpload
+              onFileSelect={handleFileSelect}
+              disabled={isLoading}
+            />
+            
+            <ToolsSelector
+              onToolSelect={handleToolSelect}
+              onShowToolsDialog={onShowToolsDialog}
+              disabled={isLoading}
+            />
           </div>
           
           {/* Center - Input field */}
@@ -146,10 +119,31 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder={hasApiKey ? (selectedTool ? `Using ${selectedTool} - describe what you want...` : "") : "Connect to an AI provider to start chatting..."}
+              placeholder={hasApiKey ? (selectedTool ? `Using ${selectedTool} - describe what you want...` : "Ask anything") : "Connect to an AI provider to start chatting..."}
               disabled={isLoading}
               className="h-10 text-sm border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 placeholder:text-muted-foreground/60"
             />
+          </div>
+
+          {/* Right side icons */}
+          <div className="flex items-center gap-4">
+            <VoiceHandler
+              onSpeechResult={onVoiceResult}
+              isListening={isListening}
+              setIsListening={setIsListening}
+            />
+            
+            <TooltipProvider>
+              <Button
+                onClick={handleSend}
+                disabled={isLoading || (!inputValue.trim() && !selectedFile)}
+                size="icon"
+                className="h-8 w-8 rounded-full"
+                title="Send Message"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </TooltipProvider>
           </div>
         </div>
       </div>
