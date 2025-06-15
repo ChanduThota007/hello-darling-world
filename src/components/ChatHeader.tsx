@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -122,13 +123,12 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    size="sm"
+                    size="icon"
                     variant="ghost"
                     onClick={onNewChat}
-                    className="h-8 gap-2"
+                    className="h-8 w-8"
                   >
                     <Plus className="h-5 w-5" />
-                    New Chat
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
