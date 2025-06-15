@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -99,49 +98,61 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         )}
         
         <div className="max-w-3xl mx-auto">
-          <div className="relative flex items-center bg-background border-2 border-border rounded-full shadow-lg px-4 py-3 gap-2">
-            <FileUpload
-              onFileSelect={handleFileSelect}
-              disabled={isLoading}
-            />
+          <div className="bg-background border-2 border-border rounded-lg shadow-lg p-3">
+            {/* Header with "Ask anything" */}
+            <div className="flex justify-end mb-2">
+              <span className="text-sm text-muted-foreground">Ask anything</span>
+            </div>
             
-            <ToolsSelector
-              onToolSelect={handleToolSelect}
-              onShowToolsDialog={onShowToolsDialog}
-              disabled={isLoading}
-            />
+            {/* Input area */}
+            <div className="mb-3">
+              <Input
+                ref={inputRef}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder={hasApiKey ? (selectedTool ? `Using ${selectedTool} - describe what you want...` : "") : "Connect to an AI provider to start chatting..."}
+                disabled={isLoading}
+                className="h-12 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-2 placeholder:text-muted-foreground/60"
+              />
+            </div>
             
-            <Input
-              ref={inputRef}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder={hasApiKey ? (selectedTool ? `Using ${selectedTool} - describe what you want...` : "Ask anything") : "Connect to an AI provider to start chatting..."}
-              disabled={isLoading}
-              className="flex-1 h-12 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-2 placeholder:text-muted-foreground/60"
-            />
-            
-            <VoiceHandler
-              onSpeechResult={onVoiceResult}
-              isListening={isListening}
-              setIsListening={setIsListening}
-            />
-            
-            <TooltipProvider>
-              <Button
-                onClick={handleSend}
-                disabled={isLoading || (!inputValue.trim() && !selectedFile)}
-                size="icon"
-                className="h-12 w-12 rounded-full"
-                title="Send Message"
-              >
-                <Send className="h-5 w-5" />
-              </Button>
-            </TooltipProvider>
+            {/* Controls row */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileUpload
+                  onFileSelect={handleFileSelect}
+                  disabled={isLoading}
+                />
+                
+                <ToolsSelector
+                  onToolSelect={handleToolSelect}
+                  onShowToolsDialog={onShowToolsDialog}
+                  disabled={isLoading}
+                />
+                
+                <VoiceHandler
+                  onSpeechResult={onVoiceResult}
+                  isListening={isListening}
+                  setIsListening={setIsListening}
+                />
+              </div>
+              
+              <TooltipProvider>
+                <Button
+                  onClick={handleSend}
+                  disabled={isLoading || (!inputValue.trim() && !selectedFile)}
+                  size="icon"
+                  className="h-10 w-10 rounded-full"
+                  title="Send Message"
+                >
+                  <Send className="h-5 w-5" />
+                </Button>
+              </TooltipProvider>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 };
-
