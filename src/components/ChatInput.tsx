@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -71,7 +72,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <div className="border-t bg-card">
-      <div className="container mx-auto px-4 py-3">
+      <div className="container mx-auto px-4 py-4">
         {(selectedFile || selectedTool) && (
           <div className="flex items-center gap-2 mb-3 p-2 bg-muted rounded-lg max-w-3xl mx-auto">
             {selectedFile && (
@@ -98,7 +99,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         )}
         
         <div className="max-w-3xl mx-auto">
-          <div className="relative flex items-center bg-background border-2 border-border rounded-full shadow-lg px-4 py-2 gap-2">
+          <div className="relative flex items-center bg-background border-2 border-border rounded-full shadow-lg px-4 py-3 gap-2">
             <FileUpload
               onFileSelect={handleFileSelect}
               disabled={isLoading}
@@ -117,7 +118,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               onKeyPress={handleKeyPress}
               placeholder={hasApiKey ? (selectedTool ? `Using ${selectedTool} - describe what you want...` : "Ask anything") : "Connect to an AI provider to start chatting..."}
               disabled={isLoading}
-              className="flex-1 h-10 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-2 placeholder:text-muted-foreground/60"
+              className="flex-1 h-12 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-2 placeholder:text-muted-foreground/60"
             />
             
             <VoiceHandler
@@ -131,7 +132,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                 onClick={handleSend}
                 disabled={isLoading || (!inputValue.trim() && !selectedFile)}
                 size="icon"
-                className="h-10 w-10 rounded-full"
+                className="h-12 w-12 rounded-full"
                 title="Send Message"
               >
                 <Send className="h-5 w-5" />
@@ -143,3 +144,4 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     </div>
   );
 };
+
