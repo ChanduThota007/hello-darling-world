@@ -4,9 +4,11 @@ import { ChatInput } from './ChatInput';
 import { ChatContainer } from './ChatContainer';
 import { AIProviderDialog } from './AIProviderDialog';
 import { UserProfileDialog } from './UserProfileDialog';
+import { ToolsDialog } from './ToolsDialog';
 import { ChatWelcome } from './ChatWelcome';
 import { toast } from '@/hooks/use-toast';
 import { aiService } from '@/services/aiService';
+import { toolsService, ToolResult } from '@/services/toolsService';
 
 interface Message {
   id: string;
@@ -19,6 +21,7 @@ interface Message {
     type: string;
     content?: string;
   };
+  toolResult?: ToolResult;
 }
 
 export const NovaChat: React.FC = () => {
@@ -28,6 +31,7 @@ export const NovaChat: React.FC = () => {
   const [isListening, setIsListening] = useState(false);
   const [showApiDialog, setShowApiDialog] = useState(false);
   const [showProfileDialog, setShowProfileDialog] = useState(false);
+  const [showToolsDialog, setShowToolsDialog] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(false);
   const [userAvatar, setUserAvatar] = useState<string>('');
   const [aiAvatar, setAiAvatar] = useState<string>('');
@@ -104,7 +108,7 @@ export const NovaChat: React.FC = () => {
     });
   };
 
-  const handleSendMessage = async (content: string, file?: File) => {
+  const handleSendMessage = async (content: string, file?: File, toolId?: string) => {
     if (!content.trim() && !file) return;
 
     if (!hasApiKey) {
@@ -119,6 +123,7 @@ export const NovaChat: React.FC = () => {
 
     let fileContent: string | undefined;
     let fileInfo: Message['file'] | undefined;
+    let toolResult: ToolResult | undefined;
 
     if (file) {
       try {
@@ -139,13 +144,35 @@ export const NovaChat: React.FC = () => {
       }
     }
 
+    // Execute tool if selected
+    if (toolId) {
+      try {
+        toolResult = await toolsService.executeTool(toolId, content, { file: fileInfo });
+        if (!toolResult.success) {
+          toast({
+            title: "Tool Error",
+            description: toolResult.error || "Failed to execute tool",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        console.error('Tool execution error:', error);
+        toast({
+          title: "Tool Error",
+          description: "Failed to execute the selected tool",
+          variant: "destructive"
+        });
+      }
+    }
+
     const messageContent = content.trim() || `Attached file: ${file?.name}`;
     const userMessage: Message = {
       id: Date.now().toString(),
       content: messageContent,
       sender: 'user',
       timestamp: new Date(),
-      file: fileInfo
+      file: fileInfo,
+      toolResult
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -156,7 +183,7 @@ export const NovaChat: React.FC = () => {
       const conversationHistory = [...messages, userMessage].slice(-10);
       console.log('Sending to AI service:', conversationHistory);
       
-      // Include file content in the AI request if available
+      // Include file content and tool results in the AI request if available
       let aiPrompt = messageContent;
       if (fileContent && file) {
         if (file.type.startsWith('text/')) {
@@ -166,6 +193,10 @@ export const NovaChat: React.FC = () => {
         } else {
           aiPrompt += `\n\nI've attached a file: ${file.name} (${file.type})`;
         }
+      }
+
+      if (toolResult && toolResult.success) {
+        aiPrompt += `\n\nTool Result from ${toolId}:\n${JSON.stringify(toolResult.data, null, 2)}`;
       }
       
       const response = await aiService.generateResponse([
@@ -268,6 +299,7 @@ export const NovaChat: React.FC = () => {
           setIsListening={setIsListening}
           onSendMessage={handleSendMessage}
           onVoiceResult={handleVoiceResult}
+          onShowToolsDialog={() => setShowToolsDialog(true)}
         />
       </div>
 
@@ -285,6 +317,11 @@ export const NovaChat: React.FC = () => {
         currentAiAvatar={aiAvatar}
         onUserAvatarChange={handleUserAvatarChange}
         onAiAvatarChange={handleAiAvatarChange}
+      />
+
+      <ToolsDialog
+        open={showToolsDialog}
+        onOpenChange={setShowToolsDialog}
       />
     </div>
   );

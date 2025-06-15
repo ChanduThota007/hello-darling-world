@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Send, X } from 'lucide-react';
 import { VoiceHandler } from './VoiceHandler';
 import { FileUpload } from './FileUpload';
+import { ToolsSelector } from './ToolsSelector';
 
 interface ChatInputProps {
   inputValue: string;
@@ -13,8 +14,9 @@ interface ChatInputProps {
   hasApiKey: boolean;
   isListening: boolean;
   setIsListening: (listening: boolean) => void;
-  onSendMessage: (content: string, file?: File) => void;
+  onSendMessage: (content: string, file?: File, toolId?: string) => void;
   onVoiceResult: (transcript: string) => void;
+  onShowToolsDialog: () => void;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
@@ -25,9 +27,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   isListening,
   setIsListening,
   onSendMessage,
-  onVoiceResult
+  onVoiceResult,
+  onShowToolsDialog
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedTool, setSelectedTool] = useState<string | null>(null);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -37,33 +41,57 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   const handleSend = () => {
-    onSendMessage(inputValue, selectedFile || undefined);
+    onSendMessage(inputValue, selectedFile || undefined, selectedTool || undefined);
     setSelectedFile(null);
+    setSelectedTool(null);
   };
 
   const handleFileSelect = (file: File) => {
     setSelectedFile(file);
   };
 
+  const handleToolSelect = (toolId: string) => {
+    setSelectedTool(toolId);
+    // Auto-focus input and add tool indicator
+    const input = document.querySelector('input[type="text"]') as HTMLInputElement;
+    if (input) {
+      input.focus();
+    }
+  };
+
   const removeFile = () => {
     setSelectedFile(null);
+  };
+
+  const removeTool = () => {
+    setSelectedTool(null);
   };
 
   return (
     <div className="border-t bg-card">
       <div className="container mx-auto px-4 py-4">
-        {selectedFile && (
+        {(selectedFile || selectedTool) && (
           <div className="flex items-center gap-2 mb-2 p-2 bg-muted rounded-md max-w-3xl mx-auto">
-            <span className="text-sm text-muted-foreground flex-1">
-              📎 {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
-            </span>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={removeFile}
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            {selectedFile && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  📎 {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
+                </span>
+                <Button size="sm" variant="ghost" onClick={removeFile}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            {selectedTool && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  🔧 Using tool: {selectedTool}
+                </span>
+                <Button size="sm" variant="ghost" onClick={removeTool}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
         )}
         <div className="flex items-center gap-2 max-w-3xl mx-auto">
@@ -72,7 +100,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder={hasApiKey ? "Ask anything..." : "Connect to an AI provider to start chatting..."}
+              placeholder={hasApiKey ? (selectedTool ? `Using ${selectedTool} - describe what you want...` : "Ask anything...") : "Connect to an AI provider to start chatting..."}
               disabled={isLoading}
               className="flex-1 h-12 text-base"
             />
@@ -87,6 +115,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           </div>
           <FileUpload
             onFileSelect={handleFileSelect}
+            disabled={isLoading}
+          />
+          <ToolsSelector
+            onToolSelect={handleToolSelect}
+            onShowToolsDialog={onShowToolsDialog}
             disabled={isLoading}
           />
           <VoiceHandler

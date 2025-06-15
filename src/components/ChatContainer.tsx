@@ -3,12 +3,20 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChatMessage } from './ChatMessage';
 import { LoadingIndicator } from './LoadingIndicator';
+import { ToolResult } from '@/services/toolsService';
 
 interface Message {
   id: string;
   content: string;
   sender: 'user' | 'nova';
   timestamp: Date;
+  file?: {
+    name: string;
+    size: number;
+    type: string;
+    content?: string;
+  };
+  toolResult?: ToolResult;
 }
 
 interface ChatContainerProps {
