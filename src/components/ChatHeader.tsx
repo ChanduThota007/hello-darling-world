@@ -71,12 +71,12 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                     size="icon"
                     variant="ghost"
                     onClick={onShowProfileDialog}
-                    className="h-8 w-8"
+                    className="h-10 w-10"
                   >
-                    <Avatar className="h-5 w-5">
+                    <Avatar className="h-7 w-7">
                       <AvatarImage src={userAvatar} alt="User avatar" />
                       <AvatarFallback>
-                        <User className="h-4 w-4" />
+                        <User className="h-5 w-5" />
                       </AvatarFallback>
                     </Avatar>
                   </Button>
