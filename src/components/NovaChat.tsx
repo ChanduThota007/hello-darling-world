@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatHeader } from './ChatHeader';
 import { ChatContainer } from './ChatContainer';
+import { ChatInput } from './ChatInput';
 import { AIProviderDialog } from './AIProviderDialog';
 import { UserProfileDialog } from './UserProfileDialog';
 import { ToolsDialog } from './ToolsDialog';
@@ -337,9 +338,11 @@ export const NovaChat: React.FC = () => {
         />
 
         {/* Chat Area */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden flex flex-col">
           {!hasMessages ? (
-            <ChatWelcome />
+            <div className="flex-1">
+              <ChatWelcome />
+            </div>
           ) : (
             <ChatContainer
               messages={messages}
@@ -357,6 +360,24 @@ export const NovaChat: React.FC = () => {
               onShowToolsDialog={() => setShowToolsDialog(true)}
               inputRef={inputRef}
             />
+          )}
+          
+          {/* Always show input area */}
+          {!hasMessages && (
+            <div className="border-t p-4">
+              <ChatInput
+                inputValue={inputValue}
+                setInputValue={setInputValue}
+                isLoading={isLoading}
+                hasApiKey={hasApiKey}
+                isListening={isListening}
+                setIsListening={setIsListening}
+                onSendMessage={handleSendMessage}
+                onVoiceResult={handleVoiceResult}
+                onShowToolsDialog={() => setShowToolsDialog(true)}
+                inputRef={inputRef}
+              />
+            </div>
           )}
         </div>
       </div>
