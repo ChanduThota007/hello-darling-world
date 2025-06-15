@@ -121,7 +121,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               onKeyPress={handleKeyPress}
               placeholder={hasApiKey ? (selectedTool ? `Using ${selectedTool} - describe what you want...` : "Ask anything") : "Connect to an AI provider to start chatting..."}
               disabled={isLoading}
-              className="h-10 text-sm border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 placeholder:text-muted-foreground/60"
+              className="h-10 text-sm border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 placeholder:text-muted-foreground/60 placeholder:font-bold"
             />
           </div>
 
