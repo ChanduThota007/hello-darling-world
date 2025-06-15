@@ -97,7 +97,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       )}
       
       <div className="bg-background border border-border rounded-3xl shadow-sm p-4">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
           {/* Left side icons */}
           <div className="flex items-center gap-4">
             <FileUpload
@@ -113,7 +113,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           </div>
           
           {/* Center - Input field */}
-          <div className="flex-1 max-w-md">
+          <div className="flex-1">
             <Input
               ref={inputRef}
               value={inputValue}
@@ -138,7 +138,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                 onClick={handleSend}
                 disabled={isLoading || (!inputValue.trim() && !selectedFile)}
                 size="icon"
-                className="h-8 w-8 rounded-full"
+                className="h-8 w-8 rounded-full bg-black hover:bg-gray-800 text-white"
                 title="Send Message"
               >
                 <Send className="h-4 w-4" />
