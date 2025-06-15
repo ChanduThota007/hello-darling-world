@@ -97,11 +97,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       )}
       
       <div className="bg-background border border-border rounded-3xl shadow-sm p-4">
-        <div className="flex items-center gap-4">
-          {/* Left side - Ask anything text above icons */}
-          <div className="flex flex-col gap-2 px-1">
+        <div className="flex items-center gap-6">
+          {/* Left side - Ask anything text above all icons */}
+          <div className="flex flex-col gap-3 px-2">
             <span className="text-sm text-muted-foreground whitespace-nowrap">Ask anything</span>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <FileUpload
                 onFileSelect={handleFileSelect}
                 disabled={isLoading}
@@ -112,6 +112,24 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                 onShowToolsDialog={onShowToolsDialog}
                 disabled={isLoading}
               />
+
+              <VoiceHandler
+                onSpeechResult={onVoiceResult}
+                isListening={isListening}
+                setIsListening={setIsListening}
+              />
+              
+              <TooltipProvider>
+                <Button
+                  onClick={handleSend}
+                  disabled={isLoading || (!inputValue.trim() && !selectedFile)}
+                  size="icon"
+                  className="h-8 w-8 rounded-full"
+                  title="Send Message"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </TooltipProvider>
             </div>
           </div>
           
@@ -126,27 +144,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               disabled={isLoading}
               className="h-10 text-sm border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 placeholder:text-muted-foreground/60"
             />
-          </div>
-          
-          {/* Right side - Voice and Send */}
-          <div className="flex items-center gap-2">
-            <VoiceHandler
-              onSpeechResult={onVoiceResult}
-              isListening={isListening}
-              setIsListening={setIsListening}
-            />
-            
-            <TooltipProvider>
-              <Button
-                onClick={handleSend}
-                disabled={isLoading || (!inputValue.trim() && !selectedFile)}
-                size="icon"
-                className="h-8 w-8 rounded-full"
-                title="Send Message"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </TooltipProvider>
           </div>
         </div>
       </div>
