@@ -96,7 +96,11 @@ export const VoiceHandler: React.FC<VoiceHandlerProps> = ({
               variant={isListening ? "destructive" : "ghost"}
               onClick={isListening ? stopListening : startListening}
               disabled={!isSupported}
-              className="h-10 w-10"
+              className={`h-10 w-10 transition-all duration-300 ${
+                isListening 
+                  ? 'scale-110 animate-pulse' 
+                  : 'hover:scale-105 hover:bg-accent'
+              }`}
             >
               {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
             </Button>
@@ -112,7 +116,7 @@ export const VoiceHandler: React.FC<VoiceHandlerProps> = ({
               size="icon"
               variant="ghost"
               onClick={() => speak("Hello, I'm Nova, your AI assistant.")}
-              className="h-10 w-10"
+              className="h-10 w-10 transition-all duration-200 hover:scale-105 hover:bg-accent"
             >
               <Volume2 className="h-4 w-4" />
             </Button>
