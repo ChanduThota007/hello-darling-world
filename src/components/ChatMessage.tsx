@@ -2,7 +2,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Bot } from 'lucide-react';
+import { User, Bot, Paperclip } from 'lucide-react';
 
 interface ChatMessageProps {
   message: {
@@ -10,6 +10,12 @@ interface ChatMessageProps {
     content: string;
     sender: 'user' | 'nova';
     timestamp: Date;
+    file?: {
+      name: string;
+      size: number;
+      type: string;
+      content?: string;
+    };
   };
   userAvatar?: string;
   aiAvatar?: string;
@@ -45,6 +51,18 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar, a
           : "bg-muted text-muted-foreground"
       )}>
         <p className="whitespace-pre-wrap">{message.content}</p>
+        
+        {message.file && (
+          <div className={cn(
+            "mt-2 p-2 rounded border flex items-center gap-2 text-xs",
+            isUser ? "bg-primary-foreground/10" : "bg-background/50"
+          )}>
+            <Paperclip className="h-3 w-3" />
+            <span>{message.file.name}</span>
+            <span className="opacity-70">({(message.file.size / 1024).toFixed(1)} KB)</span>
+          </div>
+        )}
+        
         <time className={cn(
           "text-xs mt-1 block opacity-70",
           isUser ? "text-right" : "text-left"

@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatHeader } from './ChatHeader';
 import { ChatInput } from './ChatInput';
@@ -14,6 +13,12 @@ interface Message {
   content: string;
   sender: 'user' | 'nova';
   timestamp: Date;
+  file?: {
+    name: string;
+    size: number;
+    type: string;
+    content?: string;
+  };
 }
 
 export const NovaChat: React.FC = () => {
@@ -85,8 +90,22 @@ export const NovaChat: React.FC = () => {
     setInputValue('');
   };
 
-  const handleSendMessage = async (content: string) => {
-    if (!content.trim()) return;
+  const readFileContent = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      
+      if (file.type.startsWith('text/') || file.type === 'application/json') {
+        reader.readAsText(file);
+      } else {
+        reader.readAsDataURL(file);
+      }
+    });
+  };
+
+  const handleSendMessage = async (content: string, file?: File) => {
+    if (!content.trim() && !file) return;
 
     if (!hasApiKey) {
       setShowApiDialog(true);
@@ -98,11 +117,35 @@ export const NovaChat: React.FC = () => {
       return;
     }
 
+    let fileContent: string | undefined;
+    let fileInfo: Message['file'] | undefined;
+
+    if (file) {
+      try {
+        fileContent = await readFileContent(file);
+        fileInfo = {
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          content: fileContent
+        };
+      } catch (error) {
+        toast({
+          title: "File Error",
+          description: "Failed to read the selected file",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+
+    const messageContent = content.trim() || `Attached file: ${file?.name}`;
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: content.trim(),
+      content: messageContent,
       sender: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
+      file: fileInfo
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -110,9 +153,25 @@ export const NovaChat: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const conversationHistory = [...messages, userMessage].slice(-10); // Keep last 10 messages for context
+      const conversationHistory = [...messages, userMessage].slice(-10);
       console.log('Sending to AI service:', conversationHistory);
-      const response = await aiService.generateResponse(conversationHistory);
+      
+      // Include file content in the AI request if available
+      let aiPrompt = messageContent;
+      if (fileContent && file) {
+        if (file.type.startsWith('text/')) {
+          aiPrompt += `\n\nFile content (${file.name}):\n${fileContent}`;
+        } else if (file.type.startsWith('image/')) {
+          aiPrompt += `\n\nI've attached an image file: ${file.name}. Please analyze it if possible.`;
+        } else {
+          aiPrompt += `\n\nI've attached a file: ${file.name} (${file.type})`;
+        }
+      }
+      
+      const response = await aiService.generateResponse([
+        ...conversationHistory.slice(0, -1),
+        { ...userMessage, content: aiPrompt }
+      ]);
       
       const novaResponse: Message = {
         id: (Date.now() + 1).toString(),
