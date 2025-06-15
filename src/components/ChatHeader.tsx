@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Sparkles, Settings, Plus, User } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { AIProvider } from '@/services/aiProviders';
@@ -58,40 +59,65 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
               </div>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={onShowProfileDialog}
-              className="h-8 w-8"
-              title="Change Profile Photos"
-            >
-              <Avatar className="h-5 w-5">
-                <AvatarImage src={userAvatar} alt="User avatar" />
-                <AvatarFallback>
-                  <User className="h-3 w-3" />
-                </AvatarFallback>
-              </Avatar>
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={onNewChat}
-              className="h-8 gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              New Chat
-            </Button>
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={onShowApiDialog}
-              className="h-8 w-8"
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
-            <ThemeToggle />
-          </div>
+          <TooltipProvider>
+            <div className="flex items-center gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={onShowProfileDialog}
+                    className="h-8 w-8"
+                  >
+                    <Avatar className="h-5 w-5">
+                      <AvatarImage src={userAvatar} alt="User avatar" />
+                      <AvatarFallback>
+                        <User className="h-3 w-3" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Change Profile Photo</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={onNewChat}
+                    className="h-8 gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    New Chat
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Start New Conversation</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={onShowApiDialog}
+                    className="h-8 w-8"
+                  >
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>AI Provider Settings</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <ThemeToggle />
+            </div>
+          </TooltipProvider>
         </div>
       </div>
     </div>

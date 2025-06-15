@@ -52,7 +52,6 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, disabled }
             onClick={() => document.getElementById('file-upload')?.click()}
             disabled={disabled}
             className="h-12 w-12"
-            title="Attach Files"
           >
             <Paperclip className="h-5 w-5" />
           </Button>
