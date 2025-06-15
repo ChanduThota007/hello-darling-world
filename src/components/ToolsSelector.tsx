@@ -57,9 +57,9 @@ export const ToolsSelector: React.FC<ToolsSelectorProps> = ({
                 size="icon"
                 variant="ghost"
                 disabled={disabled}
-                className="h-12 w-12"
+                className="h-8 w-8"
               >
-                <Wrench className="h-5 w-5" />
+                <Wrench className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
           </TooltipTrigger>

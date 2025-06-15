@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -70,9 +71,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <div className="border-t bg-card">
-      <div className="container mx-auto px-8 py-8">
+      <div className="container mx-auto px-4 py-3">
         {(selectedFile || selectedTool) && (
-          <div className="flex items-center gap-2 mb-6 p-4 bg-muted rounded-2xl max-w-5xl mx-auto">
+          <div className="flex items-center gap-2 mb-3 p-2 bg-muted rounded-lg max-w-3xl mx-auto">
             {selectedFile && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
@@ -96,8 +97,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           </div>
         )}
         
-        <div className="max-w-5xl mx-auto">
-          <div className="relative flex items-center bg-background border-2 border-border rounded-full shadow-xl px-6 py-4 gap-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="relative flex items-center bg-background border-2 border-border rounded-full shadow-lg px-4 py-2 gap-2">
             <FileUpload
               onFileSelect={handleFileSelect}
               disabled={isLoading}
@@ -116,7 +117,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               onKeyPress={handleKeyPress}
               placeholder={hasApiKey ? (selectedTool ? `Using ${selectedTool} - describe what you want...` : "Ask anything") : "Connect to an AI provider to start chatting..."}
               disabled={isLoading}
-              className="flex-1 h-16 text-xl border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-4 placeholder:text-muted-foreground/60"
+              className="flex-1 h-10 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-2 placeholder:text-muted-foreground/60"
             />
             
             <VoiceHandler
@@ -130,10 +131,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                 onClick={handleSend}
                 disabled={isLoading || (!inputValue.trim() && !selectedFile)}
                 size="icon"
-                className="h-14 w-14 rounded-full"
+                className="h-10 w-10 rounded-full"
                 title="Send Message"
               >
-                <Send className="h-6 w-6" />
+                <Send className="h-5 w-5" />
               </Button>
             </TooltipProvider>
           </div>

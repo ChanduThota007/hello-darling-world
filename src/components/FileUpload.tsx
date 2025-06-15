@@ -51,9 +51,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, disabled }
             variant="ghost"
             onClick={() => document.getElementById('file-upload')?.click()}
             disabled={disabled}
-            className="h-12 w-12"
+            className="h-8 w-8"
           >
-            <Paperclip className="h-5 w-5" />
+            <Paperclip className="h-4 w-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>
