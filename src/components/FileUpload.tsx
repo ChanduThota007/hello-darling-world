@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Paperclip } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from '@/hooks/use-toast';
 
 interface FileUploadProps {
@@ -35,7 +36,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, disabled }
   };
 
   return (
-    <>
+    <TooltipProvider>
       <input
         type="file"
         id="file-upload"
@@ -43,15 +44,23 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, disabled }
         onChange={handleFileChange}
         accept="image/*,text/*,.pdf,.doc,.docx"
       />
-      <Button
-        size="icon"
-        variant="outline"
-        onClick={() => document.getElementById('file-upload')?.click()}
-        disabled={disabled}
-        className="h-12 w-12"
-      >
-        <Paperclip className="h-5 w-5" />
-      </Button>
-    </>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => document.getElementById('file-upload')?.click()}
+            disabled={disabled}
+            className="h-12 w-12"
+            title="Attach Files"
+          >
+            <Paperclip className="h-5 w-5" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Attach Files</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };

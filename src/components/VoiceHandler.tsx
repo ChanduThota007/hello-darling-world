@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useCallback } from 'react';
 import { Mic, MicOff, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -117,7 +118,7 @@ export const VoiceHandler: React.FC<VoiceHandlerProps> = ({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Test Voice Output</p>
+            <p>Voice Mode</p>
           </TooltipContent>
         </Tooltip>
       </div>
