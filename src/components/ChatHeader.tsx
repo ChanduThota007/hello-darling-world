@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -69,7 +68,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 <TooltipTrigger asChild>
                   <Button
                     size="icon"
-                    variant="outline"
+                    variant="ghost"
                     onClick={onShowProfileDialog}
                     className="h-8 w-8"
                   >
@@ -90,7 +89,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 <TooltipTrigger asChild>
                   <Button
                     size="icon"
-                    variant="outline"
+                    variant="ghost"
                     onClick={onShowSearch}
                     className="h-8 w-8"
                   >
@@ -107,7 +106,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                   <TooltipTrigger asChild>
                     <Button
                       size="icon"
-                      variant="outline"
+                      variant="ghost"
                       onClick={onShowExport}
                       className="h-8 w-8"
                     >
@@ -124,7 +123,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 <TooltipTrigger asChild>
                   <Button
                     size="sm"
-                    variant="outline"
+                    variant="ghost"
                     onClick={onNewChat}
                     className="h-8 gap-2"
                   >
@@ -141,7 +140,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 <TooltipTrigger asChild>
                   <Button
                     size="icon"
-                    variant="outline"
+                    variant="ghost"
                     onClick={onShowApiDialog}
                     className="h-8 w-8"
                   >
