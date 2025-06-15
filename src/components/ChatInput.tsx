@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -96,8 +97,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       )}
       
       <div className="bg-background border-2 border-border rounded-lg shadow-lg p-3">
-        {/* Header with "Ask anything" */}
-        <div className="flex justify-end mb-2">
+        {/* Header with "Ask anything" moved to left */}
+        <div className="flex justify-start mb-2">
           <span className="text-sm text-muted-foreground">Ask anything</span>
         </div>
         
