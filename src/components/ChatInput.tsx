@@ -71,9 +71,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <div className="border-t bg-card">
-      <div className="container mx-auto px-6 py-6">
+      <div className="container mx-auto px-8 py-8">
         {(selectedFile || selectedTool) && (
-          <div className="flex items-center gap-2 mb-4 p-3 bg-muted rounded-xl max-w-4xl mx-auto">
+          <div className="flex items-center gap-2 mb-6 p-4 bg-muted rounded-2xl max-w-5xl mx-auto">
             {selectedFile && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
@@ -97,8 +97,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           </div>
         )}
         
-        <div className="max-w-4xl mx-auto">
-          <div className="relative flex items-center bg-background border border-border rounded-3xl shadow-lg p-2 gap-2">
+        <div className="max-w-5xl mx-auto">
+          <div className="relative flex items-center bg-background border-2 border-border rounded-full shadow-xl px-6 py-4 gap-4">
             <FileUpload
               onFileSelect={handleFileSelect}
               disabled={isLoading}
@@ -117,7 +117,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               onKeyPress={handleKeyPress}
               placeholder={hasApiKey ? (selectedTool ? `Using ${selectedTool} - describe what you want...` : "Ask anything") : "Connect to an AI provider to start chatting..."}
               disabled={isLoading}
-              className="flex-1 h-14 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-4"
+              className="flex-1 h-16 text-lg border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-4 placeholder:text-muted-foreground/60"
             />
             
             <VoiceHandler
@@ -131,10 +131,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                 onClick={handleSend}
                 disabled={isLoading || (!inputValue.trim() && !selectedFile)}
                 size="icon"
-                className="h-12 w-12 rounded-2xl"
+                className="h-14 w-14 rounded-full"
                 title="Send Message"
               >
-                <Send className="h-5 w-5" />
+                <Send className="h-6 w-6" />
               </Button>
             </TooltipProvider>
           </div>
