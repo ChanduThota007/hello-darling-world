@@ -71,9 +71,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <div className="border-t bg-card">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-6 py-6">
         {(selectedFile || selectedTool) && (
-          <div className="flex items-center gap-2 mb-2 p-2 bg-muted rounded-md max-w-3xl mx-auto">
+          <div className="flex items-center gap-2 mb-4 p-3 bg-muted rounded-xl max-w-4xl mx-auto">
             {selectedFile && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
@@ -96,43 +96,48 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             )}
           </div>
         )}
-        <div className="flex items-center gap-2 max-w-3xl mx-auto">
-          <div className="flex-1 flex items-center gap-2">
+        
+        <div className="max-w-4xl mx-auto">
+          <div className="relative flex items-center bg-background border border-border rounded-3xl shadow-lg p-2 gap-2">
+            <FileUpload
+              onFileSelect={handleFileSelect}
+              disabled={isLoading}
+            />
+            
+            <ToolsSelector
+              onToolSelect={handleToolSelect}
+              onShowToolsDialog={onShowToolsDialog}
+              disabled={isLoading}
+            />
+            
             <Input
               ref={inputRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder={hasApiKey ? (selectedTool ? `Using ${selectedTool} - describe what you want...` : "Ask anything...") : "Connect to an AI provider to start chatting..."}
+              placeholder={hasApiKey ? (selectedTool ? `Using ${selectedTool} - describe what you want...` : "Ask anything") : "Connect to an AI provider to start chatting..."}
               disabled={isLoading}
-              className="flex-1 h-12 text-base"
+              className="flex-1 h-14 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-4"
             />
+            
+            <VoiceHandler
+              onSpeechResult={onVoiceResult}
+              isListening={isListening}
+              setIsListening={setIsListening}
+            />
+            
             <TooltipProvider>
               <Button
                 onClick={handleSend}
                 disabled={isLoading || (!inputValue.trim() && !selectedFile)}
                 size="icon"
-                className="h-12 w-12"
+                className="h-12 w-12 rounded-2xl"
                 title="Send Message"
               >
                 <Send className="h-5 w-5" />
               </Button>
             </TooltipProvider>
           </div>
-          <FileUpload
-            onFileSelect={handleFileSelect}
-            disabled={isLoading}
-          />
-          <ToolsSelector
-            onToolSelect={handleToolSelect}
-            onShowToolsDialog={onShowToolsDialog}
-            disabled={isLoading}
-          />
-          <VoiceHandler
-            onSpeechResult={onVoiceResult}
-            isListening={isListening}
-            setIsListening={setIsListening}
-          />
         </div>
       </div>
     </div>
