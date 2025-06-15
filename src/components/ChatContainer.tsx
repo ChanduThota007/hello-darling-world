@@ -35,7 +35,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   messagesEndRef
 }) => {
   return (
-    <div className="container mx-auto px-4 py-4 h-full max-w-4xl">
+    <div className="container mx-auto px-4 py-4 h-full">
       <Card className="h-full flex flex-col">
         <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((message) => (
