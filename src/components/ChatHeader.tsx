@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Sparkles, Settings, Plus, User } from 'lucide-react';
+import { Sparkles, Settings, Plus, User, Search, Download } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { AIProvider } from '@/services/aiProviders';
 
@@ -16,6 +16,8 @@ interface ChatHeaderProps {
   onNewChat: () => void;
   onShowApiDialog: () => void;
   onShowProfileDialog: () => void;
+  onShowSearch: () => void;
+  onShowExport?: () => void;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -26,7 +28,9 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   userAvatar,
   onNewChat,
   onShowApiDialog,
-  onShowProfileDialog
+  onShowProfileDialog,
+  onShowSearch,
+  onShowExport
 }) => {
   return (
     <div className="border-b bg-card">
@@ -81,6 +85,40 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                   <p>Change Profile Photo</p>
                 </TooltipContent>
               </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={onShowSearch}
+                    className="h-8 w-8"
+                  >
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Search Conversations (Ctrl+K)</p>
+                </TooltipContent>
+              </Tooltip>
+
+              {onShowExport && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={onShowExport}
+                      className="h-8 w-8"
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Export Chat</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
               
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -95,7 +133,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Start New Conversation</p>
+                  <p>Start New Conversation (Ctrl+N)</p>
                 </TooltipContent>
               </Tooltip>
               
@@ -111,7 +149,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>AI Provider Settings</p>
+                  <p>AI Provider Settings (Ctrl+,)</p>
                 </TooltipContent>
               </Tooltip>
               

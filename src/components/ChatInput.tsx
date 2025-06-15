@@ -18,6 +18,7 @@ interface ChatInputProps {
   onSendMessage: (content: string, file?: File, toolId?: string) => void;
   onVoiceResult: (transcript: string) => void;
   onShowToolsDialog: () => void;
+  inputRef?: React.RefObject<HTMLInputElement>;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
@@ -29,7 +30,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   setIsListening,
   onSendMessage,
   onVoiceResult,
-  onShowToolsDialog
+  onShowToolsDialog,
+  inputRef
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
@@ -54,9 +56,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const handleToolSelect = (toolId: string) => {
     setSelectedTool(toolId);
     // Auto-focus input and add tool indicator
-    const input = document.querySelector('input[type="text"]') as HTMLInputElement;
-    if (input) {
-      input.focus();
+    if (inputRef?.current) {
+      inputRef.current.focus();
     }
   };
 
@@ -98,6 +99,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         <div className="flex items-center gap-2 max-w-3xl mx-auto">
           <div className="flex-1 flex items-center gap-2">
             <Input
+              ref={inputRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}

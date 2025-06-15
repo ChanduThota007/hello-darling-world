@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatHeader } from './ChatHeader';
 import { ChatInput } from './ChatInput';
@@ -6,9 +7,14 @@ import { AIProviderDialog } from './AIProviderDialog';
 import { UserProfileDialog } from './UserProfileDialog';
 import { ToolsDialog } from './ToolsDialog';
 import { ChatWelcome } from './ChatWelcome';
+import { ChatSearch } from './ChatSearch';
+import { ExportDialog } from './ExportDialog';
 import { toast } from '@/hooks/use-toast';
 import { aiService } from '@/services/aiService';
 import { toolsService, ToolResult } from '@/services/toolsService';
+import { chatHistoryService, ChatHistory } from '@/services/chatHistoryService';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { useTheme } from './ThemeProvider';
 
 interface Message {
   id: string;
@@ -32,10 +38,17 @@ export const NovaChat: React.FC = () => {
   const [showApiDialog, setShowApiDialog] = useState(false);
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [showToolsDialog, setShowToolsDialog] = useState(false);
+  const [showSearchDialog, setShowSearchDialog] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(false);
   const [userAvatar, setUserAvatar] = useState<string>('');
   const [aiAvatar, setAiAvatar] = useState<string>('');
+  const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+  const [currentChat, setCurrentChat] = useState<ChatHistory | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  
+  const { setTheme, theme } = useTheme();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -79,6 +92,22 @@ export const NovaChat: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Auto-save current chat
+  useEffect(() => {
+    if (messages.length > 0 && currentChatId) {
+      const chatTitle = messages[0]?.content.substring(0, 50) + '...' || 'New Chat';
+      const chatData: ChatHistory = {
+        id: currentChatId,
+        title: chatTitle,
+        messages,
+        createdAt: new Date(currentChatId),
+        updatedAt: new Date()
+      };
+      chatHistoryService.saveChat(chatData);
+      setCurrentChat(chatData);
+    }
+  }, [messages, currentChatId]);
+
   const handleUserAvatarChange = (avatarUrl: string) => {
     setUserAvatar(avatarUrl);
     localStorage.setItem('nova-user-avatar', avatarUrl);
@@ -92,7 +121,35 @@ export const NovaChat: React.FC = () => {
   const handleNewChat = () => {
     setMessages([]);
     setInputValue('');
+    setCurrentChatId(Date.now().toString());
+    setCurrentChat(null);
   };
+
+  const handleSelectChat = (chat: ChatHistory) => {
+    setMessages(chat.messages);
+    setCurrentChatId(chat.id);
+    setCurrentChat(chat);
+  };
+
+  const handleFocusInput = () => {
+    inputRef.current?.focus();
+  };
+
+  const toggleTheme = () => {
+    const themes = ['light', 'dark', 'system'] as const;
+    const currentIndex = themes.indexOf(theme);
+    const nextTheme = themes[(currentIndex + 1) % themes.length];
+    setTheme(nextTheme);
+  };
+
+  // Set up keyboard shortcuts
+  useKeyboardShortcuts({
+    onNewChat: handleNewChat,
+    onToggleTheme: toggleTheme,
+    onFocusInput: handleFocusInput,
+    onShowSettings: () => setShowApiDialog(true),
+    onShowSearch: () => setShowSearchDialog(true)
+  });
 
   const readFileContent = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -119,6 +176,11 @@ export const NovaChat: React.FC = () => {
         variant: "destructive"
       });
       return;
+    }
+
+    // Create new chat if none exists
+    if (!currentChatId) {
+      setCurrentChatId(Date.now().toString());
     }
 
     let fileContent: string | undefined;
@@ -272,6 +334,8 @@ export const NovaChat: React.FC = () => {
           onNewChat={handleNewChat}
           onShowApiDialog={() => setShowApiDialog(true)}
           onShowProfileDialog={() => setShowProfileDialog(true)}
+          onShowSearch={() => setShowSearchDialog(true)}
+          onShowExport={currentChat ? () => setShowExportDialog(true) : undefined}
         />
 
         {/* Chat Area */}
@@ -300,6 +364,7 @@ export const NovaChat: React.FC = () => {
           onSendMessage={handleSendMessage}
           onVoiceResult={handleVoiceResult}
           onShowToolsDialog={() => setShowToolsDialog(true)}
+          inputRef={inputRef}
         />
       </div>
 
@@ -323,6 +388,20 @@ export const NovaChat: React.FC = () => {
         open={showToolsDialog}
         onOpenChange={setShowToolsDialog}
       />
+
+      <ChatSearch
+        open={showSearchDialog}
+        onOpenChange={setShowSearchDialog}
+        onSelectChat={handleSelectChat}
+      />
+
+      {currentChat && (
+        <ExportDialog
+          open={showExportDialog}
+          onOpenChange={setShowExportDialog}
+          chat={currentChat}
+        />
+      )}
     </div>
   );
 };
