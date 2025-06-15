@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -96,14 +97,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         </div>
       )}
       
-      <div className="bg-background border-2 border-border rounded-lg shadow-lg p-3">
+      <div className="bg-background border-2 border-border rounded-3xl shadow-lg p-3">
         {/* Header with "Ask anything" moved to left */}
-        <div className="flex justify-start mb-2">
+        <div className="flex justify-start mb-1">
           <span className="text-sm text-muted-foreground">Ask anything</span>
         </div>
         
         {/* Input area */}
-        <div className="mb-3">
+        <div className="mb-2">
           <Input
             ref={inputRef}
             value={inputValue}
@@ -152,3 +153,4 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     </div>
   );
 };
+
