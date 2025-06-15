@@ -1,7 +1,7 @@
-
 import React, { useState, useRef, useCallback } from 'react';
 import { Mic, MicOff, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from '@/hooks/use-toast';
 
 interface VoiceHandlerProps {
@@ -86,24 +86,41 @@ export const VoiceHandler: React.FC<VoiceHandlerProps> = ({
   }, []);
 
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        size="icon"
-        variant={isListening ? "destructive" : "outline"}
-        onClick={isListening ? stopListening : startListening}
-        disabled={!isSupported}
-        className="h-10 w-10"
-      >
-        {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-      </Button>
-      <Button
-        size="icon"
-        variant="outline"
-        onClick={() => speak("Hello, I'm Nova, your AI assistant.")}
-        className="h-10 w-10"
-      >
-        <Volume2 className="h-4 w-4" />
-      </Button>
-    </div>
+    <TooltipProvider>
+      <div className="flex items-center gap-2">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="icon"
+              variant={isListening ? "destructive" : "outline"}
+              onClick={isListening ? stopListening : startListening}
+              disabled={!isSupported}
+              className="h-10 w-10"
+            >
+              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{isListening ? "Stop Recording" : "Start Voice Input"}</p>
+          </TooltipContent>
+        </Tooltip>
+        
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => speak("Hello, I'm Nova, your AI assistant.")}
+              className="h-10 w-10"
+            >
+              <Volume2 className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Test Voice Output</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
   );
 };
