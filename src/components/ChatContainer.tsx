@@ -3,7 +3,6 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChatMessage } from './ChatMessage';
 import { LoadingIndicator } from './LoadingIndicator';
-import { ChatInput } from './ChatInput';
 import { ToolResult } from '@/services/toolsService';
 
 interface Message {
@@ -26,7 +25,7 @@ interface ChatContainerProps {
   userAvatar: string;
   aiAvatar: string;
   messagesEndRef: React.RefObject<HTMLDivElement>;
-  // Chat input props
+  // Props that are passed through but not used directly in this component
   inputValue: string;
   setInputValue: (value: string) => void;
   hasApiKey: boolean;
@@ -43,21 +42,12 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   isLoading,
   userAvatar,
   aiAvatar,
-  messagesEndRef,
-  inputValue,
-  setInputValue,
-  hasApiKey,
-  isListening,
-  setIsListening,
-  onSendMessage,
-  onVoiceResult,
-  onShowToolsDialog,
-  inputRef
+  messagesEndRef
 }) => {
   return (
-    <div className="container mx-auto px-4 py-4 h-full flex flex-col">
-      <Card className="flex-1 flex flex-col">
-        <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className="container mx-auto px-4 py-4 h-full">
+      <Card className="h-full">
+        <CardContent className="h-full overflow-y-auto p-4 space-y-4">
           {messages.map((message) => (
             <ChatMessage 
               key={message.id} 
@@ -69,22 +59,6 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
           {isLoading && <LoadingIndicator />}
           <div ref={messagesEndRef} />
         </CardContent>
-        
-        {/* Integrated Chat Input */}
-        <div className="border-t p-4">
-          <ChatInput
-            inputValue={inputValue}
-            setInputValue={setInputValue}
-            isLoading={isLoading}
-            hasApiKey={hasApiKey}
-            isListening={isListening}
-            setIsListening={setIsListening}
-            onSendMessage={onSendMessage}
-            onVoiceResult={onVoiceResult}
-            onShowToolsDialog={onShowToolsDialog}
-            inputRef={inputRef}
-          />
-        </div>
       </Card>
     </div>
   );

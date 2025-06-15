@@ -338,37 +338,21 @@ export const NovaChat: React.FC = () => {
         />
 
         {/* Chat Area */}
-        <div className="flex-1 overflow-hidden flex flex-col">
+        <div className="flex-1 flex flex-col min-h-0">
           {!hasMessages ? (
-            <div className="flex-1">
+            <div className="flex-1 overflow-y-auto">
               <ChatWelcome />
             </div>
           ) : (
-            <ChatContainer
-              messages={messages}
-              isLoading={isLoading}
-              userAvatar={userAvatar}
-              aiAvatar={aiAvatar}
-              messagesEndRef={messagesEndRef}
-              inputValue={inputValue}
-              setInputValue={setInputValue}
-              hasApiKey={hasApiKey}
-              isListening={isListening}
-              setIsListening={setIsListening}
-              onSendMessage={handleSendMessage}
-              onVoiceResult={handleVoiceResult}
-              onShowToolsDialog={() => setShowToolsDialog(true)}
-              inputRef={inputRef}
-            />
-          )}
-          
-          {/* Always show input area */}
-          {!hasMessages && (
-            <div className="border-t p-4">
-              <ChatInput
+            <div className="flex-1 overflow-hidden">
+              <ChatContainer
+                messages={messages}
+                isLoading={isLoading}
+                userAvatar={userAvatar}
+                aiAvatar={aiAvatar}
+                messagesEndRef={messagesEndRef}
                 inputValue={inputValue}
                 setInputValue={setInputValue}
-                isLoading={isLoading}
                 hasApiKey={hasApiKey}
                 isListening={isListening}
                 setIsListening={setIsListening}
@@ -379,9 +363,26 @@ export const NovaChat: React.FC = () => {
               />
             </div>
           )}
+          
+          {/* Always show input area at bottom */}
+          <div className="flex-shrink-0 border-t bg-background p-4">
+            <ChatInput
+              inputValue={inputValue}
+              setInputValue={setInputValue}
+              isLoading={isLoading}
+              hasApiKey={hasApiKey}
+              isListening={isListening}
+              setIsListening={setIsListening}
+              onSendMessage={handleSendMessage}
+              onVoiceResult={handleVoiceResult}
+              onShowToolsDialog={() => setShowToolsDialog(true)}
+              inputRef={inputRef}
+            />
+          </div>
         </div>
       </div>
 
+      {/* All dialog components remain the same */}
       <AIProviderDialog
         open={showApiDialog}
         onOpenChange={setShowApiDialog}
