@@ -97,11 +97,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       )}
       
       <div className="bg-background border border-border rounded-3xl shadow-sm p-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {/* Left side - Ask anything text above icons */}
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2 px-1">
             <span className="text-sm text-muted-foreground whitespace-nowrap">Ask anything</span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <FileUpload
                 onFileSelect={handleFileSelect}
                 disabled={isLoading}
