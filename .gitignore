@@ -1,0 +1,9 @@
+# Ignore sensitive (or generated) files (for example, .env, node_modules, .DS_Store, .log, nova.db, screenshots, notes, journals, etc.)
+.env
+node_modules
+.DS_Store
+*.log
+nova.db
+screenshots
+notes
+journals 
