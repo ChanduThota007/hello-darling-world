@@ -98,20 +98,21 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       
       <div className="bg-background border border-border rounded-3xl shadow-sm p-4">
         <div className="flex items-center gap-3">
-          {/* Left side - Ask anything text and controls */}
-          <div className="flex items-center gap-3 flex-1">
+          {/* Left side - Ask anything text above icons */}
+          <div className="flex flex-col gap-1">
             <span className="text-sm text-muted-foreground whitespace-nowrap">Ask anything</span>
-            
-            <FileUpload
-              onFileSelect={handleFileSelect}
-              disabled={isLoading}
-            />
-            
-            <ToolsSelector
-              onToolSelect={handleToolSelect}
-              onShowToolsDialog={onShowToolsDialog}
-              disabled={isLoading}
-            />
+            <div className="flex items-center gap-2">
+              <FileUpload
+                onFileSelect={handleFileSelect}
+                disabled={isLoading}
+              />
+              
+              <ToolsSelector
+                onToolSelect={handleToolSelect}
+                onShowToolsDialog={onShowToolsDialog}
+                disabled={isLoading}
+              />
+            </div>
           </div>
           
           {/* Center - Input field */}
