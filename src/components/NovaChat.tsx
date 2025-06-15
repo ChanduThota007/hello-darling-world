@@ -1,7 +1,5 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatHeader } from './ChatHeader';
-import { ChatInput } from './ChatInput';
 import { ChatContainer } from './ChatContainer';
 import { AIProviderDialog } from './AIProviderDialog';
 import { UserProfileDialog } from './UserProfileDialog';
@@ -349,23 +347,18 @@ export const NovaChat: React.FC = () => {
               userAvatar={userAvatar}
               aiAvatar={aiAvatar}
               messagesEndRef={messagesEndRef}
+              inputValue={inputValue}
+              setInputValue={setInputValue}
+              hasApiKey={hasApiKey}
+              isListening={isListening}
+              setIsListening={setIsListening}
+              onSendMessage={handleSendMessage}
+              onVoiceResult={handleVoiceResult}
+              onShowToolsDialog={() => setShowToolsDialog(true)}
+              inputRef={inputRef}
             />
           )}
         </div>
-
-        {/* Input Area */}
-        <ChatInput
-          inputValue={inputValue}
-          setInputValue={setInputValue}
-          isLoading={isLoading}
-          hasApiKey={hasApiKey}
-          isListening={isListening}
-          setIsListening={setIsListening}
-          onSendMessage={handleSendMessage}
-          onVoiceResult={handleVoiceResult}
-          onShowToolsDialog={() => setShowToolsDialog(true)}
-          inputRef={inputRef}
-        />
       </div>
 
       <AIProviderDialog
