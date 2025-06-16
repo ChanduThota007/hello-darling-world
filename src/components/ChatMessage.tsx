@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { User, Bot, Paperclip, CheckCircle, XCircle, Wrench } from 'lucide-react';
 import { ToolResult } from '@/services/toolsService';
+import { useTheme } from './ThemeProvider';
 
 interface ChatMessageProps {
   message: {
@@ -27,6 +28,7 @@ interface ChatMessageProps {
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar, aiAvatar }) => {
   const isUser = message.sender === 'user';
+  const { actualTheme } = useTheme();
   
   // Default AI avatar if none provided
   const defaultAiAvatar = "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=100&h=100&fit=crop&crop=face";
@@ -42,7 +44,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar, a
           alt={isUser ? "User" : "Nova AI"} 
         />
         <AvatarFallback className={cn(
-          isUser ? "bg-primary text-primary-foreground" : "bg-muted"
+          "text-white",
+          actualTheme === 'light' ? "bg-gray-800" : "bg-white text-gray-800"
         )}>
           {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
         </AvatarFallback>
@@ -50,16 +53,16 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar, a
       
       <div className={cn(
         "max-w-[80%] rounded-lg px-4 py-2 text-sm",
-        isUser 
-          ? "bg-primary text-primary-foreground ml-auto" 
-          : "bg-muted text-foreground"
+        actualTheme === 'light' 
+          ? "bg-gray-800 text-white" 
+          : "bg-white text-gray-800"
       )}>
         <p className="whitespace-pre-wrap">{message.content}</p>
         
         {message.file && (
           <div className={cn(
             "mt-2 p-2 rounded border flex items-center gap-2 text-xs",
-            isUser ? "bg-primary-foreground/10" : "bg-background/50"
+            actualTheme === 'light' ? "bg-white/10" : "bg-gray-800/10"
           )}>
             <Paperclip className="h-3 w-3" />
             <span>{message.file.name}</span>
@@ -70,7 +73,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar, a
         {message.toolResult && (
           <Card className={cn(
             "mt-2 text-xs",
-            isUser ? "bg-primary-foreground/10" : "bg-background/50"
+            actualTheme === 'light' ? "bg-white/10" : "bg-gray-800/10"
           )}>
             <CardHeader className="p-2 pb-1">
               <div className="flex items-center gap-2">
@@ -94,7 +97,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar, a
               {message.toolResult.success ? (
                 <div className="space-y-1">
                   {message.toolResult.data && (
-                    <pre className="text-xs bg-background/50 p-2 rounded overflow-x-auto">
+                    <pre className={cn(
+                      "text-xs p-2 rounded overflow-x-auto",
+                      actualTheme === 'light' ? "bg-white/20" : "bg-gray-800/20"
+                    )}>
                       {typeof message.toolResult.data === 'object' 
                         ? JSON.stringify(message.toolResult.data, null, 2)
                         : String(message.toolResult.data)
